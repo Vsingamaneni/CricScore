@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title><%= title %></title>
+    <link rel="stylesheet" href="css/dashboard.css">
+    <link rel="stylesheet" href="css/schedule.css">
+    <%- include('../header.ejs') %>
+</head>
+<body style="background-color: #f6f7fa;">
+
+<div>
+    <%- include('../body.ejs') %>
+    <div class="content" style="background-color:#f6f7fa">
+        <br><br><br><br><br><br>
+        <div class="container">
+            <% if(typeof alert != 'undefined') { %>
+                <br/>
+                <% alert.forEach(function(error) { %>
+                    <div style="color:red;text-align: center;font-size: 15px; font-weight: 900; font-family: Roboto, sans-serif;" role="alert">
+                        <%= error.msg %>
+                    </div>
+                    <br><br><br>
+                <% }) %>
+            <% } %>
+            <% if(typeof msg != 'undefined') { %>
+                <br/>
+                <% msg.forEach(function(success) { %>
+                    <div style="color:#6bec10;text-align: center;font-size: 25px; font-weight: 900; font-family: Roboto, sans-serif;" role="alert">
+                        <%= success %>
+                    </div>
+                    <br><br><br>
+                <% }) %>
+            <% } %>
+            <table class="table table-dark table-striped">
+                <thead>
+                <tr>
+                    <th>#</th>
+                    <th>First Name</th>
+                    <th>Last Name</th>
+                    <th>Favourite</th>
+                    <th>Location</th>
+                    <th>Status</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr style="height: 10px;"></tr>
+                    <% usersList.forEach(function(user){ %>
+                        <% if (user.current) { %>
+                            <tr style="background-color: #19B3D3;">
+                        <% } %>
+                        <% if (!user.current) { %>
+                            <tr>
+                        <% } %>
+                            <td><%= user.memberId %></td>
+                            <td><%= user.fname %></td>
+                            <td><%= user.lname %></td>
+                            <td><%= user.selectedTeam %></td>
+                            <td><%= user.country %></td>
+                            <% if (loginDetails.role == 'member' ){%>
+                                <% if (user.isActive){%>
+<!--                                    <td> <a href="#" class="users_btn">Active</a> </td>-->
+                                    <td> <a href="#" class="users_active_btn">Active</a> </td>
+                                <% }%>
+                                <% if (!user.isActive){%>
+                                    <!--<td> <a href="#" class="users_inactive_btn">In Active</a> </td>-->
+                                    <td> <a href="/activate/<%= user.memberId %>" class="users_inactive_btn" >In Active</a> </td>
+                                <% }%>
+                            <% }%>
+                            <% if (loginDetails.role == 'admin' ){%>
+                                <% if (user.isAdminActivated){%>
+                                    <% if (user.isActive){%>
+                                        <!--<td> <a href="#" class="users_btn">Active</a> </td>-->
+                                        <td> <a href="#" class="users_active_btn">Active</a> </td>
+                                    <% }%>
+                                    <% if (!user.isActive){%>
+                                         <!--<td> <a href="/activate/<%= user.memberId %>" class="users_inactive_btn">Active User</a> </td>-->
+                                         <td> <a href="/activate/<%= user.memberId %>" class="users_activate_btn">Activate User</a> </td>
+                                    <% }%>
+                                <% }%>
+                                <% if (!user.isAdminActivated){%>
+                                        <!--<td> <a href="/activate/<%= user.memberId %>" class="users_inactive_btn">Active User</a> </td>-->
+                                        <td> <a href="/activate/<%= user.memberId %>" class="users_activate_btn">Activate User</a> </td>
+                                <% }%>
+                            <% }%>
+                        </tr>
+                    <% }); %>
+
+                </tbody>
+            </table>
+        </div>
+
+    </div>
+</div>
+
+</body>
+</html>
