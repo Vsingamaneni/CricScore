@@ -61,21 +61,16 @@
                             </select>
                         </td>
                         <!--<td>
-                            <div style="width: 100px; margin:0 auto; color: white;">
-                                <input type="submit" value="PREDICT">
-                            </div>
-                            &lt;!&ndash;<a href="/savePredictions/<%= match.matchNumber %>/<%= memberId %>" class="predict_btn">Predict</a>&ndash;&gt;
+                            <a href="/predict/<%= match.matchNumber %>/<%= memberId %>" class="update_btn">Update</a>
                         </td>-->
                     </tr>
                     <tr style="height: 20px;"></tr>
                 <% }); %>
                 </tbody>
             </table>
-                <!--
-                    <div style="width: 100px; margin-left: auto; margin-right: auto;color: white;">
-                        <input type="submit" value="SUBMIT">
-                    </div>
-                 -->
+                <div style="width: 100px; margin-left: auto; margin-right: auto;color: white;">
+                    <input type="submit" value="SUBMIT">
+                </div>
             </form>
         </div>
 

@@ -8,7 +8,7 @@ module.exports = {
         connection = mysql.createConnection({
             host:'localhost',
             user:'root',
-            password:'',
+            password:'Sweety143:',
             database:'react'
         });
         return connection;

@@ -69,9 +69,12 @@ app.get('/logout', schedule.removeCookie);
 
 // Prediction routes
 app.get('/predictions', predictions.predictions);
+app.get('/viewPredictions', predictions.viewPredictions);
 app.get('/predict/:matchDay/:memberId', predictions.predict);
+app.get('/predictGame/:matchNumber/:memberId', predictions.predictPerGame);
 app.post('/savePredictions/:matchDay', predictions.savePredictions);
 app.get('/updatePredictions/:matchDay/:memberId', predictions.updatePredictions);
+app.post('/savePredictions/:matchNumber/:memberId', predictions.saveSinglePredictions);
 app.get('/updatePredictions/', predictions.updatePredictions);
 
 app.get('/users',(req, res) => {

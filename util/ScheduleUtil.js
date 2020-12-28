@@ -31,7 +31,7 @@ exports.matchDetails = async function getMatchDetails(connection, req){
                 if (results.length > 0){
                     results.forEach(function(item) {
                         // item.clientTime = clientTimeZone(item.deadline, req.cookies.clientOffset);
-                        item.momentClientTime = clientTimeZoneMoment(item.deadline, req.cookies.clientOffset)
+                        item.momentClientTime = clientTimeZoneMoment(item.deadline, req.cookies.clientOffset);
                         schedule.push(item);
                     });
                     resolve(schedule);

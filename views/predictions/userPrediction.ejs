@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title><%= title %></title>
+    <link rel="stylesheet" href="/css/dashboard.css">
+    <link rel="stylesheet" href="/css/schedule.css">
+    <%- include('../header.ejs') %>
+</head>
+<body style="background-color: #f6f7fa;">
+
+<div>
+    <%- include('../body.ejs') %>
+    <div class="content" style="background-color:#f6f7fa">
+        <br><br><br><br>
+        <br><br><br><br>
+
+        <div class="container">
+            <table class="table table-dark table-striped">
+                <thead>
+                <tr>
+                    <th>Match #</th>
+                    <th>Game</th>
+                    <th>Deadline</th>
+                    <th>Predicted Time</th>
+                    <th>Selected</th>
+                    <th>Action</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr style="height: 10px;"></tr>
+                <% viewPredictions.forEach(function(match){ %>
+                    <tr>
+                        <td><%= match.matchNumber %></td>
+                        <td><%= match.game %></td>
+                        <td><%= match.deadline %></td>
+                        <td><%= match.predictedTime %></td>
+                        <td><%= match.selected %></td>
+                        <td> <% if (match.allow !== undefined && match.allow) { %>
+                                <a href="/predictGame/<%= match.matchNumber %>/<%= memberId %>" class="predict_btn">Predict</a>
+                            <% } %>
+                            <% if (match.allow !== undefined && !match.allow) { %>
+                                <a href="/updatePredictions/<%= match.matchNumber %>/<%= memberId %>" class="predicted_btn">Update</a>
+                            <% } %>
+                        </td>
+                    </tr>
+                    <tr style="height: 20px;"></tr>
+                <% }); %>
+                </tbody>
+            </table>
+        </div>
+
+    </div>
+</div>
+
+</body>
+</html>
