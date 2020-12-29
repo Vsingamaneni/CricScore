@@ -25,6 +25,7 @@ const connection = db.dbConnection();
 exports.predictions = app.get('/predictions', async (req, res) => {
     try {
         if (req.cookies.loginDetails) {
+            let type = 'all';
             let loginDetails = JSON.parse(req.cookies.loginDetails);
             let alert;
             let msg;
@@ -62,6 +63,7 @@ exports.predictions = app.get('/predictions', async (req, res) => {
                 schedule: gameWeekSchedule,
                 memberId: loginDetails.memberId,
                 userLogin: loginDetails,
+                type: type,
                 alert,
                 msg,
                 fail
@@ -79,10 +81,10 @@ exports.predictions = app.get('/predictions', async (req, res) => {
 exports.viewPredictions = app.get('/viewPredictions', async (req, res) => {
     try {
         if (req.cookies.loginDetails) {
+            let type = 'single';
             let loginDetails = JSON.parse(req.cookies.loginDetails);
 
             let schedules = await predictionUtils.sortSchedule(connection);
-
             let matchDay = 100;
             schedules.forEach(schedule => {
                 if (schedule.isActive) {
@@ -99,7 +101,8 @@ exports.viewPredictions = app.get('/viewPredictions', async (req, res) => {
                 team: loginDetails.team,
                 fname: loginDetails.fName,
                 memberId: loginDetails.memberId,
-                viewPredictions: predictions
+                viewPredictions: predictions,
+                type: type
             });
 
         } else {
@@ -111,13 +114,22 @@ exports.viewPredictions = app.get('/viewPredictions', async (req, res) => {
     }
 });
 
-exports.predict = app.get('/predict/:matchDay/:memberId', async (req, res) => {
+exports.predict = app.get('/predict/:matchDay/:memberId/:matchDay/:type', async (req, res) => {
     if (req.cookies.loginDetails) {
+        const type = req.params.type;
         let loginDetails = JSON.parse(req.cookies.loginDetails);
         const matchDay = req.params.matchDay;
         let schedule = await predictionUtils.getMatchdaySchedule(connection, matchDay, req);
-        let matchDeadline;
+        let userPredictions = await predictionUtils.getMatchdayPredictions(connection, loginDetails.memberId, matchDay);
+        schedule = predictionUtils.mapSelectedPredictions(userPredictions, schedule)
 
+        let msg;
+        if (undefined != req.cookies.msg) {
+            msg = req.cookies.msg;
+            res.cookie('msg', null, {expires: new Date(Date.now() + 0 * 0), httpOnly: true});
+        }
+
+        let matchDeadline;
         if (schedule.length > 0){
             matchDeadline = schedule[0].deadline;
         }
@@ -130,7 +142,9 @@ exports.predict = app.get('/predict/:matchDay/:memberId', async (req, res) => {
             schedule: schedule,
             memberId: loginDetails.memberId,
             matchDay: matchDay,
-            matchDeadline: matchDeadline
+            matchDeadline: matchDeadline,
+            type:type,
+            msg: msg
         });
     }
     return res.render('login/login', {
@@ -138,11 +152,11 @@ exports.predict = app.get('/predict/:matchDay/:memberId', async (req, res) => {
     });
 });
 
-exports.predictPerGame = app.get('/predictGame/:matchNumber/:memberId', async (req, res) => {
+exports.predictPerGame = app.get('/predictGame/:matchNumber/:memberId/:type', async (req, res) => {
     if (req.cookies.loginDetails) {
         let loginDetails = JSON.parse(req.cookies.loginDetails);
         const matchNumber = req.params.matchNumber;
-        const memberId = req.params.memberId;
+        const type = req.params.type;
         let schedule = await predictionUtils.getMatchSchedule(connection, matchNumber);
         let matchDeadline;
 
@@ -157,7 +171,8 @@ exports.predictPerGame = app.get('/predictGame/:matchNumber/:memberId', async (r
             fname: loginDetails.fName,
             schedule: schedule,
             memberId: loginDetails.memberId,
-            matchDeadline: matchDeadline
+            matchDeadline: matchDeadline,
+            type: type
         });
     }
     return res.render('login/login', {
@@ -205,7 +220,7 @@ exports.savePredictions = app.post('/savePredictions/:matchDay', urlencodedParse
     }
 });
 
-exports.saveSinglePredictions = app.post('/savePredictions/:matchNumber/:memberId', urlencodedParser, [
+exports.saveSinglePredictions = app.post('/savePredictions/:matchNumber/:memberId/:matchDay/:type', urlencodedParser, [
     check('selected1', 'Select All games')
         .custom((value, {req}) => {
             const matchNumber = req.params.matchNumber;
@@ -230,7 +245,14 @@ exports.saveSinglePredictions = app.post('/savePredictions/:matchNumber/:memberI
                 const msg = [];
                 msg.push('Predictions saved successfully for Game # : ' + matchNumber);
                 res.cookie('msg', msg, {expires: new Date(Date.now() + 60 * 60000), httpOnly: true});
-                return res.redirect('/predictions');
+                let type = req.params.type;
+                let matchDay = req.params.matchDay;
+                let memberId = req.params.memberId;
+                if (type == 'all'){
+                    return res.redirect('/predict/'+matchNumber+"/"+memberId+"/"+matchDay+"/"+type);
+                } else if (type == 'single'){
+                    return res.redirect('/viewPredictions');
+                }
             } else {
                 const fail = [];
                 fail.push('Unable to save predictions for Game # : ' + matchNumber);
@@ -252,8 +274,11 @@ exports.updatePredictions = app.get('/updatePredictions/:matchDay/:memberId', as
     if (req.cookies.loginDetails) {
         let loginDetails = JSON.parse(req.cookies.loginDetails);
         const matchDay = req.params.matchDay;
-        const memberId = req.params.memberId;
         let schedule = await predictionUtils.getMatchdaySchedule(connection, matchDay, req);
+
+        let predictions = await predictionUtils.userPredictions(connection, loginDetails.memberId, matchDay);
+
+        predictions = predictionUtils.mapScheduleToPrediction(schedules, predictions, req);
 
         let matchDeadline;
 
@@ -263,7 +288,7 @@ exports.updatePredictions = app.get('/updatePredictions/:matchDay/:memberId', as
 
         res.cookie('schedule', schedule, {expires: new Date(Date.now() + 100 * 60000), httpOnly: true});
 
-        return res.render('predictions/updatePredictions', {
+        return res.render('predictions/matchPredictions', {
             title: 'Update Predictions ',
             team: loginDetails.team,
             fname: loginDetails.fName,

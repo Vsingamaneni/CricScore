@@ -36,10 +36,10 @@
                         <td><%= match.predictedTime %></td>
                         <td><%= match.selected %></td>
                         <td> <% if (match.allow !== undefined && match.allow) { %>
-                                <a href="/predictGame/<%= match.matchNumber %>/<%= memberId %>" class="predict_btn">Predict</a>
+                                <a href="/predictGame/<%= match.matchNumber %>/<%= memberId %>/<%= type %>" class="predict_btn">Predict</a>
                             <% } %>
                             <% if (match.allow !== undefined && !match.allow) { %>
-                                <a href="/updatePredictions/<%= match.matchNumber %>/<%= memberId %>" class="predicted_btn">Update</a>
+                                <a href="/updatePredictions/<%= match.matchNumber %>/<%= memberId %>/<%= type %>" class="predicted_btn">Update</a>
                             <% } %>
                         </td>
                     </tr>

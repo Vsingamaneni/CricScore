@@ -44,12 +44,12 @@
                 <% } %>
             <table class="table table-dark table-striped">
                 <thead>
-                <tr>
-                    <th>Match Day</th>
-                    <th>Deadline</th>
-                    <th># of Games</th>
-                    <th>Prediction Status</th>
-                    <th>Action</th>
+                <tr style="background-color: #5b5d5d;font-size: 18px;">
+                    <th><i>DAY</i></th>
+                    <th><i>DEADLINE</i></th>
+                    <th><i># GAMES</i></th>
+                    <th><i>PREDICTION STATUS</i></th>
+                    <th><i>ACTION</i></th>
                 </tr>
                 </thead>
                 <tbody>
@@ -67,10 +67,10 @@
                             <% } %>
                         </td>
                         <td> <% if (match.allow !== undefined && match.allow) { %>
-                                <a href="/predict/<%= match.matchDay %>/<%= memberId %>" class="predict_btn">Predict</a>
+                                <a href="/predict/<%= match.matchNumber %>/<%= memberId %>/<%= match.matchDay %>/<%= type %>" class="predict_btn">Predict</a>
                             <% } %>
                             <% if (match.allow !== undefined && !match.allow) { %>
-                                <a href="/updatePredictions/<%= match.matchDay %>/<%= memberId %>" class="predicted_btn">Update</a>
+                                <a href="/updatePredictions/<%= match.matchNumber %>/<%= memberId %>/<%= match.matchDay %>/<%= type %>" class="predicted_btn">Update</a>
                             <% } %>
                         </td>
                     </tr>

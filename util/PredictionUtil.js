@@ -1,7 +1,6 @@
 const path = require('path');
 const express = require('express');
 const bodyParser = require('body-parser');
-const moment = require('moment');
 var mom = require('moment-timezone');
 
 const app = express();
@@ -113,8 +112,14 @@ exports.getMatchSchedule = async function getMatchSchedule(connection, matchNumb
 }
 
 // returns the entire predictions for the given matchDay and memberId.
-exports.getMatchdayPredictions = async function getMatchdayPredictions(connection, memberId) {
-    let sql = `Select * from PREDICTIONS where memberId = ${memberId}`;
+exports.getMatchdayPredictions = async function getMatchdayPredictions(connection, memberId, matchDay) {
+    let sql;
+    if (matchDay != null){
+        sql = `Select * from PREDICTIONS where memberId = ${memberId} and matchDay = ${matchDay}`;
+    } else {
+        sql = `Select * from PREDICTIONS where memberId = ${memberId}`;
+    }
+
     let matches = [];
 
     await new Promise((resolve, reject) => {
@@ -168,15 +173,35 @@ exports.mapPredictionsToSchedule = function mapPredictionsToSchedule(predictions
         })
     }
 
-    // predictions is a map
+}
 
+exports.mapSelectedPredictions = function mapSelectedPredictions(predictions, schedule) {
+    // schedule is a list
+    if (schedule.length > 0) {
+        schedule.forEach(function (match) {
+            let predictionFound = false;
+            if (predictions.size > 0) {
+                for (const [key, value] of predictions.entries()) {
+                    value.forEach(function(prediction){
+                        if (match.matchNumber ==  prediction.matchNumber) {
+                            predictionFound = true;
+                            match.selected = prediction.selected;
+                            match.predictionFound = predictionFound;
+                        }
+                    });
+                }
+            }
+            match.predictionFound = predictionFound;
+        })
+    }
+    return schedule;
 }
 
 // Returns the current active matchDay
 exports.getActiveMatchDay = async function getActiveMatchDay(connection) {
     let sql = `Select *
                from SCHEDULE
-               where isActive = true LIMIT 1`;
+               where isActive = true order by matchNumber asc LIMIT 1`;
     let matchDay;
 
     await new Promise((resolve, reject) => {
@@ -227,6 +252,7 @@ exports.predictionDetails = function predictionDetails(matchDaySchedule) {
             singleSchedule.games = value.length;
             singleSchedule.deadline = value[0].deadline;
             singleSchedule.allow = true;
+            singleSchedule.matchNumber = value[0].matchNumber;
             finalPredictionSchedule.push(singleSchedule);
         }
     }
