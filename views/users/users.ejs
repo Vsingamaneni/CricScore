@@ -25,31 +25,31 @@
             <% if(typeof msg != 'undefined') { %>
                 <br/>
                 <% msg.forEach(function(success) { %>
-                    <div style="color:#6bec10;text-align: center;font-size: 25px; font-weight: 900; font-family: Roboto, sans-serif;" role="alert">
-                        <%= success %>
+                    <div style="color:#5b5d5d;text-align: center;font-size: 25px; font-weight: 900; font-family: Roboto, sans-serif;" role="alert">
+                       <i><%= success %></i>
                     </div>
                     <br><br><br>
                 <% }) %>
             <% } %>
             <table class="table table-dark table-striped">
                 <thead>
-                <tr>
-                    <th>#</th>
-                    <th>First Name</th>
-                    <th>Last Name</th>
-                    <th>Favourite</th>
-                    <th>Location</th>
-                    <th>Status</th>
+                <tr style="background-color: #5b5d5d;font-size: 18px;">
+                    <th><i>#</i></th>
+                    <th><i>First Name</i></th>
+                    <th><i>Last Name</i></th>
+                    <th><i>Favourite</i></th>
+                    <th><i>Location</i></th>
+                    <th><i>Status</i></th>
                 </tr>
                 </thead>
                 <tbody>
                 <tr style="height: 10px;"></tr>
                     <% usersList.forEach(function(user){ %>
                         <% if (user.current) { %>
-                            <tr style="background-color: #19B3D3;">
+                            <tr style="background-color: #19B3D3;font-size: 18px;">
                         <% } %>
                         <% if (!user.current) { %>
-                            <tr>
+                            <tr style="font-size: 18px;">
                         <% } %>
                             <td><%= user.memberId %></td>
                             <td><%= user.fname %></td>
@@ -70,7 +70,8 @@
                                 <% if (user.isAdminActivated){%>
                                     <% if (user.isActive){%>
                                         <!--<td> <a href="#" class="users_btn">Active</a> </td>-->
-                                        <td> <a href="#" class="users_active_btn">Active</a> </td>
+                                        <!--<td> <a href="#" class="users_active_btn">Active</a> </td>-->
+                                        <td> <a href="/deActivate/<%= user.memberId %>" class="users_active_btn">Deactivate</a> </td>
                                     <% }%>
                                     <% if (!user.isActive){%>
                                          <!--<td> <a href="/activate/<%= user.memberId %>" class="users_inactive_btn">Active User</a> </td>-->

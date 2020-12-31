@@ -42,8 +42,25 @@ exports.userDetails = async function getUserDetails(connection, req){
     });
 }
 
-exports.activateUser = async function getMatchDetails(connection, memberId){
+exports.activateUser = async function activateUser(connection, memberId){
     let sql = "Update REGISTER set isActive = true , isAdminActivated = true where memberId = "+ memberId;
+    return await new Promise( (resolve,reject) => {
+        connection.query(sql, function(err, results) {
+            if(err){
+                reject(err);
+            } else {
+                if (results.affectedRows > 0){
+                    resolve(true);
+                } else {
+                    resolve(false);
+                }
+            }
+        });
+    });
+}
+
+exports.deActivateUser = async function deActivateUser(connection, memberId){
+    let sql = "Update REGISTER set isActive = false where memberId = "+ memberId;
     return await new Promise( (resolve,reject) => {
         connection.query(sql, function(err, results) {
             if(err){

@@ -6,7 +6,7 @@
     <link rel="stylesheet" href="/css/schedule.css">
     <%- include('../header.ejs') %>
     <style>
-         input[type=submit] {
+        input[type=submit] {
             background-color: #343a40;
             border: none;
             color: #19B3D3;
@@ -29,50 +29,83 @@
     <div class="content" style="background-color:#f6f7fa">
         <br><br><br><br>
         <br><br><br><br>
-<!--        <div style="width: 100px; margin-left: auto; margin-right: auto;">
-            <input type="submit" value="Deadline : Dec 15, 2020 18:00:00 ">
-        </div>-->
-        <h1 style="text-align: center; color: #19B3D3;">Deadline : <i><%= matchDeadline%> </i></h1>
-        <div class="container">
 
-            <form autocomplete="off" action="/savePredictions/<%= matchDay %>" method="POST">
-
-            <table class="table table-dark table-striped">
-                <thead>
-                <tr>
-                    <th><i>#</i></th>
-                    <th><i>Game</i></th>
-                    <th><i>Deadline</i></th>
-                    <th><i>Select</i></th>
-                    <!--<th><i>Action</i></th>-->
-                </tr>
-                </thead>
-                <tbody>
-                <tr style="height: 10px;"></tr>
-                <% schedule.forEach(function(match){ %>
-                    <tr>
-                        <td><%= match.matchNumber %></td>
-                        <td><%= match.homeTeam %> vs <%= match.awayTeam %></td>
-                        <td><%= match.deadline %></td>
-                        <td> <select name="selected<%= match.matchNumber %>" style="background-color: #f1f4f5; color:black; padding: 6px 10px;margin: 8px 0; display: inline-block;border: 1px solid #ccc;border-radius: 4px; box-sizing: border-box; font-size: 15px; font-weight: 900;" required>
-                                <option style="margin: 0 auto;">--- Select Result ---</option>
-                                <option><%= match.homeTeam %></option>
-                                <option><%= match.awayTeam %></option>
-                            </select>
-                        </td>
-                        <!--<td>
-                            <a href="/predict/<%= match.matchNumber %>/<%= memberId %>" class="update_btn">Update</a>
-                        </td>-->
-                    </tr>
-                    <tr style="height: 20px;"></tr>
-                <% }); %>
-                </tbody>
-            </table>
-                <div style="width: 100px; margin-left: auto; margin-right: auto;color: white;">
-                    <input type="submit" value="SUBMIT">
+        <% if(typeof msg != 'undefined') { %>
+            <br/>
+            <% msg.forEach(function(success) { %>
+                <div style="color:#4c4e4b;text-align: center;font-size: 25px; font-weight: 900; font-family: Roboto, sans-serif;" role="alert">
+                    <i><%= success %></i>
                 </div>
-            </form>
-        </div>
+                <br><br><br>
+            <% }) %>
+        <% } %>
+
+        <% if(typeof alert != 'undefined') { %>
+            <br/>
+            <% alert.forEach(function(error) { %>
+                <div style="color:red;text-align: center;font-size: 15px; font-weight: 900; font-family: Roboto, sans-serif;" role="alert">
+                    <i><%= error.msg %></i>
+                </div>
+                <br><br><br>
+            <% }) %>
+        <% } %>
+
+        <% schedule.forEach(function(match){ %>
+            <div class="container">
+                <h1 style="text-align: center; color: #19B3D3;">Deadline : <i><%= match.deadline %> </i></h1>
+                <form autocomplete="off" action="/updateSinglePredictions/<%= match.matchNumber %>/<%= memberId %>/<%= match.matchDay %>/<%= type %>" method="POST">
+
+                    <table class="table table-dark table-striped">
+                        <thead>
+                        <tr style="background-color: #5b5d5d;font-size: 18px;">
+                            <th><i>#</i></th>
+                            <th><i>GAME</i></th>
+                            <th><i>DEADLINE</i></th>
+                            <th><i>CURRENT</i></th>
+                            <th><i>SELECT</i></th>
+                            <th><i>ACTION</i></th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr style="height: 10px;"></tr>
+                        <tr>
+                            <td><%= match.matchNumber %></td>
+                            <td><%= match.homeTeam %> vs <%= match.awayTeam %></td>
+                            <td><%= match.deadline %></td>
+                            <td>
+                                <%= match.selected %>
+                            </td>
+                            <td> <select name="selected" style="background-color: #f1f4f5; color:black; padding: 6px 10px;margin: 8px 0; display: inline-block;border: 1px solid #ccc;border-radius: 4px; box-sizing: border-box; font-size: 15px; font-weight: 900;" required>
+                                        <option style="margin: 0 auto;">--- Select Team ---</option>
+                                        <option><%= match.homeTeam %></option>
+                                        <option><%= match.awayTeam %></option>
+                                    </select>
+                            </td>
+                            <td style="text-align:center;">
+                                <button type="submit" class="btn-primary" style="border-radius: 8px;"><a
+                                            style="color:white;font-size:15px;text-decoration:none;/*font-family:Comic Sans MS*/">UPDATE</a>
+                                </button>
+                            </td>
+                        </tr>
+                        <tr style="height: 20px;"></tr>
+                        </tbody>
+                    </table>
+                </form>
+            </div>
+            <br><br><br>
+        <% }); %>
+        <% if (type == 'all') { %>
+            <div style="width: 100px; margin-left: auto; margin-right: auto;color: white;">
+                <a href="/predictions" style="border-radius: 5px;color:white;font-size:20px;text-decoration:none;" class="btn-primary" >BACK</a>
+                <!--<input type="submit" formaction="/predictions" value="BACK">-->
+            </div>
+        <% } %>
+        <% if (type == 'single') { %>
+            <div style="width: 100px; margin-left: auto; margin-right: auto;color: white;">
+                <a href="/viewPredictions" style="border-radius: 5px;color:white;font-size:20px;text-decoration:none;" class="btn-primary" >BACK</a>
+                <!--<input type="submit" formaction="/viewPredictions" value="BACK">-->
+            </div>
+        <% } %>
 
     </div>
 </div>

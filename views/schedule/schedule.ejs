@@ -11,7 +11,8 @@
 <div>
     <%- include('../body.ejs') %>
     <div class="content" style="background-color:#f6f7fa">
-        <br><br><br><br><br><br>
+        <br><br><br><br>
+        <br><br><br><br>
         <div class="container">
             <table class="table table-dark table-striped">
                 <thead>
@@ -28,10 +29,10 @@
                 <% for (const [key, value] of scheduleMap.entries()) { %>
                     <% value.forEach(function(game){ %>
                     <% if (game.isActive) { %>
-                            <tr style="background-color: #19B3D3;">
+                            <tr style="background-color: #19B3D3;font-size: 18px;">
                         <% } %>
                         <% if (!game.isActive) { %>
-                            <tr>
+                            <tr style="font-size: 18px;">
                         <% } %>
                         <td><%= game.matchDay %></td>
                         <td><%= game.homeTeam %> vs <%= game.awayTeam %></td>

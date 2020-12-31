@@ -3,6 +3,8 @@ const express = require('express');
 const bodyParser = require('body-parser');
 var mom = require('moment-timezone');
 
+mom.suppressDeprecationWarnings = true;
+
 const app = express();
 
 //set views file
@@ -18,7 +20,8 @@ app.use('/public', express.static('public'));
 
 exports.sortSchedule = async function getSchedule(connection) {
 
-    let sql = `Select * from SCHEDULE`;
+    let sql = `Select *
+               from SCHEDULE`;
     var schedules = [];
 
     await new Promise((resolve, reject) => {
@@ -86,7 +89,7 @@ exports.getMatchdaySchedule = async function getMatchdaySchedule(connection, mat
 // returns the entire schedule for the given matchDay.
 exports.getMatchSchedule = async function getMatchSchedule(connection, matchNumber) {
 
-    let sql = `Select * from SCHEDULE where matchDay =${matchNumber}`;
+    let sql = `Select * from SCHEDULE where matchNumber =${matchNumber}`;
     var matches = [];
 
     await new Promise((resolve, reject) => {
@@ -114,7 +117,7 @@ exports.getMatchSchedule = async function getMatchSchedule(connection, matchNumb
 // returns the entire predictions for the given matchDay and memberId.
 exports.getMatchdayPredictions = async function getMatchdayPredictions(connection, memberId, matchDay) {
     let sql;
-    if (matchDay != null){
+    if (matchDay != null) {
         sql = `Select * from PREDICTIONS where memberId = ${memberId} and matchDay = ${matchDay}`;
     } else {
         sql = `Select * from PREDICTIONS where memberId = ${memberId}`;
@@ -182,8 +185,8 @@ exports.mapSelectedPredictions = function mapSelectedPredictions(predictions, sc
             let predictionFound = false;
             if (predictions.size > 0) {
                 for (const [key, value] of predictions.entries()) {
-                    value.forEach(function(prediction){
-                        if (match.matchNumber ==  prediction.matchNumber) {
+                    value.forEach(function (prediction) {
+                        if (match.matchNumber == prediction.matchNumber) {
                             predictionFound = true;
                             match.selected = prediction.selected;
                             match.predictionFound = predictionFound;
@@ -201,7 +204,8 @@ exports.mapSelectedPredictions = function mapSelectedPredictions(predictions, sc
 exports.getActiveMatchDay = async function getActiveMatchDay(connection) {
     let sql = `Select *
                from SCHEDULE
-               where isActive = true order by matchNumber asc LIMIT 1`;
+               where isActive = true
+               order by matchNumber asc LIMIT 1`;
     let matchDay;
 
     await new Promise((resolve, reject) => {
@@ -299,7 +303,7 @@ exports.validateMemberSinglePrediction = function validateMemberSinglePrediction
             }
         });
         let selectedValue = req.body.selected;
-        if (selectedValue == '--- Select Result ---') {
+        if (selectedValue == '--- Select Team ---') {
             noError = false;
         }
     } else {
@@ -310,7 +314,47 @@ exports.validateMemberSinglePrediction = function validateMemberSinglePrediction
 
 exports.userPredictions = async function userPredictions(connection, memberId, matchDay) {
 
-    let sql = `Select * from PREDICTIONS where memberId = ` + memberId + ` and matchday >= ` + matchDay;
+    let sql = `Select *
+               from PREDICTIONS
+               where memberId = ` + memberId + ` and matchday >= ` + matchDay;
+    var predictions = [];
+
+    await new Promise((resolve, reject) => {
+        var result = connection.query(sql, function (err, results) {
+            if (err) {
+                reject(err);
+            } else {
+                if (results.length > 0) {
+                    results.forEach(function (item) {
+                        predictions.push(item);
+                    });
+                    resolve(predictions);
+                } else {
+                    resolve(predictions);
+                }
+            }
+        });
+    });
+
+
+    /*    schedules.forEach(schedule => {
+            var d1 = new Date();
+            var d2 = new Date(schedule.deadline);
+            if (d1.getTime() < d2.getTime()) {
+                schedule.allow = true;
+            } else {
+                schedule.allow = false;
+            }
+
+        });*/
+    return predictions;
+}
+
+exports.retrievePrediction = async function retrievePrediction(connection, memberId, matchId) {
+
+    let sql = `Select *
+               from PREDICTIONS
+               where memberId = ` + memberId + ` and matchNumber = ` + matchId;
     var predictions = [];
 
     await new Promise((resolve, reject) => {
@@ -416,7 +460,6 @@ exports.saveSinglePredictions = async function saveSinglePredictions(connection,
             homeTeam = match.homeTeam;
             awayTeam = match.awayTeam;
             firstName = loginDetails.fName + ' ' + loginDetails.lName;
-            //selected = returnSelectedValue(req, matchNumber);
             selected = req.body.selected;
 
             let data = {
@@ -446,6 +489,24 @@ exports.saveSinglePredictions = async function saveSinglePredictions(connection,
     return isPredictionSaveSuccess;
 }
 
+exports.updateSinglePrediction = async function updateSinglePrediction(connection, req, matchId, res) {
+    let isPredictionSaveSuccess = false;
+
+    let date = new Date().toLocaleDateString() + " " + new Date().toLocaleTimeString();
+
+    let sql = "UPDATE PREDICTIONS SET selected='"+ req.body.selected +"', predictedTime ='"+  date + "' where matchNumber = " +matchId;
+
+    connection.query(sql, (err, results) => {
+        if (err) {
+            const alert = 'Unable to update predictions';
+            res.cookie('alert', alert, {expires: new Date(Date.now() + 60 * 60000), httpOnly: true});
+            return res.redirect('/predictions');
+        }
+        isPredictionSaveSuccess = true;
+    });
+    return isPredictionSaveSuccess;
+}
+
 exports.mapScheduleToPrediction = function mapScheduleToPrediction(schedule, predictions, req) {
     var predictionsList = [];
     if (schedule.length > 0) {
@@ -461,17 +522,32 @@ exports.mapScheduleToPrediction = function mapScheduleToPrediction(schedule, pre
                             userPrediction.predictedTime = prediction.predictedTime;
                             userPrediction.selected = prediction.selected;
                             userPrediction.allow = false;
+                            userPrediction.homeTeam = game.homeTeam;
+                            userPrediction.awayTeam = game.awayTeam;
+                            userPrediction.matchDay = game.matchDay;
                             userPrediction.deadline = clientTimeZoneMoment(game.deadline, req.cookies.clientOffset);
                         }
                     });
-                    if (!isPredictionFound){
+                    if (!isPredictionFound) {
                         userPrediction.predictedTime = 'N/A';
                         userPrediction.selected = '-';
                         userPrediction.allow = true;
+                        userPrediction.matchDay = game.matchDay;
                         userPrediction.deadline = clientTimeZoneMoment(game.deadline, req.cookies.clientOffset);
                     }
                     predictionsList.push(userPrediction);
                 }
+            });
+        } else {
+            schedule.forEach(game => {
+                var userPrediction = {'matchNumber': game.matchNumber};
+                userPrediction.game = game.homeTeam + " vs " + game.awayTeam;
+                userPrediction.predictedTime = 'N/A';
+                userPrediction.selected = '-';
+                userPrediction.allow = true;
+                userPrediction.matchDay = game.matchDay;
+                userPrediction.deadline = clientTimeZoneMoment(game.deadline, req.cookies.clientOffset);
+                predictionsList.push(userPrediction);
             });
         }
     }
@@ -514,10 +590,11 @@ function returnSelectedValue(req, matchId) {
     return selectedvalue;
 }
 
-function clientTimeZoneMoment(date, clientTimeZone){
+function clientTimeZoneMoment(date, clientTimeZone) {
     //var format = 'YYYY/MM/DD HH:mm:ss ZZ';
     var format = 'lll';
-    return mom(date).tz(clientTimeZone).format(format);
+    //return mom(date).tz(clientTimeZone).format(format);
+    return mom(date).tz(clientTimeZone).format("YYYY-MM-DD HH:mm:ss");
 }
 
 

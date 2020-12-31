@@ -58,6 +58,7 @@ app.post('/validateSecurity', userSession.validateSecurityAnswer);
 app.post('/updatePass', userSession.updatePassword);
 app.get('/users', userSession.usersList);
 app.get('/activate/:memberId', userSession.activateMember);
+app.get('/deActivate/:memberId', userSession.deActivateMember);
 
 
 // Schedule routes
@@ -70,11 +71,13 @@ app.get('/logout', schedule.removeCookie);
 // Prediction routes
 app.get('/predictions', predictions.predictions);
 app.get('/viewPredictions', predictions.viewPredictions);
-app.get('/predict/:matchDay/:memberId/:matchDay/:type', predictions.predict);
-app.get('/predictGame/:matchNumber/:memberId/:type', predictions.predictPerGame);
+app.get('/predict/:matchNumber/:memberId/:matchDay/:type', predictions.predict);
+app.get('/predictGame/:matchNumber/:memberId/:matchDay/:type', predictions.predictPerGame);
 app.post('/savePredictions/:matchDay', predictions.savePredictions);
-app.get('/updatePredictions/:matchDay/:memberId', predictions.updatePredictions);
+app.get('/updatePredictions/:matchNumber/:memberId/:matchDay/:type', predictions.updatePredictions);
+app.post('/updatePredictions/:matchNumber/:memberId/:matchDay/:type', predictions.updatePredictionsPost);
 app.post('/savePredictions/:matchNumber/:memberId/:matchDay/:type', predictions.saveSinglePredictions);
+app.post('/updateSinglePredictions/:matchNumber/:memberId/:matchDay/:type', predictions.updateSinglePredictions);
 app.get('/updatePredictions/', predictions.updatePredictions);
 
 app.get('/users',(req, res) => {

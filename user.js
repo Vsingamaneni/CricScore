@@ -311,3 +311,24 @@ exports.activateMember = app.get('/activate/:memberId', async (req, res) => {
         });
     }
 });
+
+exports.deActivateMember = app.get('/deActivate/:memberId', async (req, res) => {
+    if (req.cookies.loginDetails) {
+        const memberId = req.params.memberId;
+
+        if (await userList.deActivateUser(connection, memberId)){
+            const msg = [];
+            msg.push('User deactivated successfully!!');
+            res.cookie('msg', msg, {expires: new Date(Date.now() + 60 * 60000), httpOnly: true});
+        } else{
+            const alert = [];
+            alert.push('Unable to activate User!!');
+            res.cookie('alert', alert, {expires: new Date(Date.now() + 60 * 60000), httpOnly: true});
+        }
+        res.redirect('/users');
+    } else {
+        res.render('login/login', {
+            title: 'Scoreboard'
+        });
+    }
+});

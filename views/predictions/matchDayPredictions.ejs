@@ -55,17 +55,11 @@
                         <td><%= match.homeTeam %> vs <%= match.awayTeam %></td>
                         <td><%= match.deadline %></td>
                         <td> <select name="selected<%= match.matchNumber %>" style="background-color: #f1f4f5; color:black; padding: 6px 10px;margin: 8px 0; display: inline-block;border: 1px solid #ccc;border-radius: 4px; box-sizing: border-box; font-size: 15px; font-weight: 900;" required>
-                                <option style="margin: 0 auto;">--- Select Result ---</option>
+                                <option style="margin: 0 auto;">--- Select Team ---</option>
                                 <option><%= match.homeTeam %></option>
                                 <option><%= match.awayTeam %></option>
                             </select>
                         </td>
-                        <!--<td>
-                            <div style="width: 100px; margin:0 auto; color: white;">
-                                <input type="submit" value="PREDICT">
-                            </div>
-                            &lt;!&ndash;<a href="/savePredictions/<%= match.matchNumber %>/<%= memberId %>" class="predict_btn">Predict</a>&ndash;&gt;
-                        </td>-->
                     </tr>
                     <tr style="height: 20px;"></tr>
                 <% }); %>

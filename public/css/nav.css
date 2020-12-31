@@ -81,7 +81,7 @@ header{
 
 .users_active_btn{
   text-decoration: none;
-  font-size: 15px;
+  font-size: 18px;
   font-weight: 600;
   color: #9bf802;
   transition: 0.5s;
@@ -99,9 +99,9 @@ header{
 
 .users_activate_btn{
   text-decoration: none;
-  font-size: 15px;
+  font-size: 18px;
   font-weight: 600;
-  color: #e022ee;
+  color: #d8b0db;
   transition: 0.5s;
   transition-property: background;
 }
