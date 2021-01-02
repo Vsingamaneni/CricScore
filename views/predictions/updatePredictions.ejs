@@ -33,7 +33,7 @@
         <% if(typeof msg != 'undefined') { %>
             <br/>
             <% msg.forEach(function(success) { %>
-                <div style="color:#4c4e4b;text-align: center;font-size: 25px; font-weight: 900; font-family: Roboto, sans-serif;" role="alert">
+                <div style="color:#4c4e4b;text-align: center;font-size: 18px; font-weight: 900; font-family: Roboto, sans-serif;" role="alert">
                     <i><%= success %></i>
                 </div>
                 <br><br><br>
@@ -43,7 +43,7 @@
         <% if(typeof alert != 'undefined') { %>
             <br/>
             <% alert.forEach(function(error) { %>
-                <div style="color:red;text-align: center;font-size: 15px; font-weight: 900; font-family: Roboto, sans-serif;" role="alert">
+                <div style="color:red;text-align: center;font-size: 18px; font-weight: 900; font-family: Roboto, sans-serif;" role="alert">
                     <i><%= error.msg %></i>
                 </div>
                 <br><br><br>
@@ -96,14 +96,12 @@
         <% }); %>
         <% if (type == 'all') { %>
             <div style="width: 100px; margin-left: auto; margin-right: auto;color: white;">
-                <a href="/predictions" style="border-radius: 5px;color:white;font-size:20px;text-decoration:none;" class="btn-primary" >BACK</a>
-                <!--<input type="submit" formaction="/predictions" value="BACK">-->
+                <a href="/predictions" class="next">&laquo; BACK</a>
             </div>
         <% } %>
         <% if (type == 'single') { %>
             <div style="width: 100px; margin-left: auto; margin-right: auto;color: white;">
-                <a href="/viewPredictions" style="border-radius: 5px;color:white;font-size:20px;text-decoration:none;" class="btn-primary" >BACK</a>
-                <!--<input type="submit" formaction="/viewPredictions" value="BACK">-->
+                <a href="/viewPredictions" class="next">&laquo; BACK</a>
             </div>
         <% } %>
 

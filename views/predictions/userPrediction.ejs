@@ -17,7 +17,8 @@
         <% if(typeof msg != 'undefined') { %>
             <br/>
             <% msg.forEach(function(success) { %>
-                <div style="color:#6bec10;text-align: center;font-size: 25px; font-weight: 900; font-family: Roboto, sans-serif;" role="alert">
+                <div style="color:#6bec10;text-align: center;font-size: 25px; font-weight: 900; font-family: Roboto, sans-serif;"
+                     role="alert">
                     <%= success %>
                 </div>
                 <br><br><br>
@@ -45,12 +46,27 @@
                         <td><%= match.deadline %></td>
                         <td><%= match.predictedTime %></td>
                         <td><%= match.selected %></td>
-                        <td> <% if (match.allow !== undefined && match.allow) { %>
-                                <a href="/predictGame/<%= match.matchNumber %>/<%= memberId %>/<%= match.matchDay %>/<%= type %>" class="predict_btn">Predict</a>
+                        <td>
+                            <% if (match.isDeadlineReached) { %>
+                                <% if (match.allow !== undefined && match.allow) { %>
+                                    <i style="color:#e77373;"> Missed </i>
+                                <% } %>
+                                <% if (match.allow !== undefined && !match.allow) { %>
+                                        <i style="color:#c0dd41;">Deadline Reached</i>
+                                <% } %>
                             <% } %>
-                            <% if (match.allow !== undefined && !match.allow) { %>
-                                <a href="/updatePredictions/<%= match.matchNumber %>/<%= memberId %>/<%= match.matchDay %>/<%= type %>" class="predicted_btn">Update</a>
+
+                            <% if (!match.isDeadlineReached) { %>
+                                <% if (match.allow !== undefined && match.allow) { %>
+                                    <a href="/predictGame/<%= match.matchNumber %>/<%= memberId %>/<%= match.matchDay %>/<%= type %>"
+                                       class="predict_btn">Predict</a>
+                                <% } %>
+                                <% if (match.allow !== undefined && !match.allow) { %>
+                                    <a href="/updatePredictions/<%= match.matchNumber %>/<%= memberId %>/<%= match.matchDay %>/<%= type %>"
+                                       class="predicted_btn">Update</a>
+                                <% } %>
                             <% } %>
+
                         </td>
                     </tr>
                     <tr style="height: 20px;"></tr>

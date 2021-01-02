@@ -64,3 +64,52 @@
     background-color: #337ab7;
     border-color: #2e6da4
 }
+
+.next {
+    background-color: #19B3D3;
+    color: white;
+}
+
+a {
+    text-decoration: none;
+    display: inline-block;
+    padding: 2px 4px;
+}
+
+a:hover {
+    background-color: #ddd;
+    color: black;
+}
+
+
+/*
+CSS for active select
+ */
+.menu a {
+    font-size: 1.2em;
+    display: inline-block;
+    margin-top: 20px;
+    padding: 8px 12px;
+    color: #666666;
+    font-weight: bold; }
+
+.menu a:hover{
+    background: #29abe2;
+    color: #fff;
+    border-radius: 5px; }
+
+.menu a.active{
+    background: #29abe2;
+    color: #fff;
+    border-radius: 5px; }
+
+#menu a .active-link{
+    background: #29abe2;
+    color: #fff;
+    border-radius: 5px; }
+
+#dashboard:target, #page2:target, #page3:target, #page4:target, #page5:target{
+    background: #29abe2;
+    color: #fff;
+    border-radius: 5px;
+}

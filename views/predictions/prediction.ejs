@@ -59,18 +59,32 @@
                         <td><%= match.matchDay %></td>
                         <td><%= match.deadline %></td>
                         <td><%= match.games %></td>
-                        <td><% if (match.allow !== undefined && match.allow) { %>
-                                <i>Not Predicted</i>
+                        <td>
+                            <% if (match.isDeadlineReached) { %>
+                                <% if  (match.allow !== undefined && match.allow) { %>
+                                    <i style="color:#e77373;"> Missed </i>
+                                <% } %>
+                                <% if  (match.allow !== undefined && !match.allow) { %>
+                                    <i> Predicted </i>
+                                <% } %>
                             <% } %>
-                            <% if (match.allow !== undefined && !match.allow) { %>
-                                <i>Predicted</i>
+                            <% if (!match.isDeadlineReached) { %>
+                                <% if (match.allow !== undefined && match.allow) { %>
+                                    <i>Not Predicted</i>
+                                <% } %>
+                                <% if (match.allow !== undefined && !match.allow) { %>
+                                    <i>Predicted</i>
+                                <% } %>
                             <% } %>
                         </td>
-                        <td> <% if (match.allow !== undefined && match.allow) { %>
+                        <td> <% if (match.allow !== undefined && match.allow && !match.isDeadlineReached) { %>
                                 <a href="/predict/<%= match.matchNumber %>/<%= memberId %>/<%= match.matchDay %>/<%= type %>" class="predict_btn">Predict</a>
                             <% } %>
-                            <% if (match.allow !== undefined && !match.allow) { %>
+                            <% if (match.allow !== undefined && !match.allow && !match.isDeadlineReached) { %>
                                 <a href="/updatePredictions/<%= match.matchNumber %>/<%= memberId %>/<%= match.matchDay %>/<%= type %>" class="predicted_btn">Update</a>
+                            <% } %>
+                            <% if (match.isDeadlineReached) {%>
+                                <i style="color:#c0dd41;">Deadline Reached</i>
                             <% } %>
                         </td>
                     </tr>

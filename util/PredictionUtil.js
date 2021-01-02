@@ -178,6 +178,28 @@ exports.mapPredictionsToSchedule = function mapPredictionsToSchedule(predictions
 
 }
 
+exports.validateDeadline = function validateDeadline(gameWeekSchedule) {
+    if (gameWeekSchedule.length > 0){
+        gameWeekSchedule.forEach(game =>{
+           game.isDeadlineReached = isDeadlineReached(game.deadline);
+        });
+    }
+}
+
+function isDeadlineReached(date) {
+    var matchDate = new Date(date);
+    var currentDate = new Date();
+
+    if (matchDate > currentDate) {
+        return false;
+    } else {
+        if (matchDate < currentDate) {
+            return true;
+        }
+        return false;
+    }
+}
+
 exports.mapSelectedPredictions = function mapSelectedPredictions(predictions, schedule) {
     // schedule is a list
     if (schedule.length > 0) {

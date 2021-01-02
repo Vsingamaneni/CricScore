@@ -56,6 +56,8 @@ exports.predictions = app.get('/predictions', async (req, res) => {
                 predictionUtils.mapPredictionsToSchedule(userPredictions, gameWeekSchedule);
             }
 
+            predictionUtils.validateDeadline(gameWeekSchedule);
+
             res.render('predictions/prediction', {
                 title: 'Predictions ',
                 team: loginDetails.team,
@@ -95,6 +97,8 @@ exports.viewPredictions = app.get('/viewPredictions', async (req, res) => {
             let predictions = await predictionUtils.userPredictions(connection, loginDetails.memberId, matchDay);
 
             predictions = predictionUtils.mapScheduleToPrediction(schedules, predictions, req);
+
+            predictionUtils.validateDeadline(predictions);
 
             res.render('predictions/userPrediction', {
                 title: 'User Predictions ',
