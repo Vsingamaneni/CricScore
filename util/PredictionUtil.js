@@ -234,6 +234,18 @@ function validateDeadline(gameWeekSchedule) {
     }
 }
 
+exports.validatePredictionDeadline = function validatePredictionDeadline(predictions) {
+    if (predictions.length > 0) {
+        predictions.forEach(game => {
+            game.isDeadlineReached = isDeadlineReached(game.deadline);
+            if (game.isDeadlineReached && game.selected == '-'){
+                game.selected = 'Default';
+                game.amount = -game.matchAmount;
+            }
+        });
+    }
+}
+
 exports.validateMatchDeadline = function validateMatchDeadline(gameWeekSchedule) {
     if (gameWeekSchedule.length > 0) {
         gameWeekSchedule.forEach(game => {
@@ -627,6 +639,8 @@ exports.mapScheduleToPrediction = function mapScheduleToPrediction(schedule, pre
                             userPrediction.matchDay = game.matchDay;
                             userPrediction.deadline = clientTimeZoneMoment(game.deadline, req.cookies.clientOffset);
                             userPrediction.amount = 0;
+                            userPrediction.matchAmount = game.minAmount;
+                            userPrediction.localDate = game.localDate;
                         }
                         predictionsList.push(userPrediction);
                     }
@@ -634,7 +648,7 @@ exports.mapScheduleToPrediction = function mapScheduleToPrediction(schedule, pre
             });
         } else {
             schedule.forEach(game => {
-                if (schedule.matchDay >= matchDay) {
+                if (game.matchDay >= matchDay) {
                     var userPrediction = {'matchNumber': game.matchNumber};
                     userPrediction.game = game.homeTeam + " vs " + game.awayTeam;
                     userPrediction.predictedTime = 'N/A';

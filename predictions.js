@@ -105,6 +105,9 @@ exports.viewPredictions = app.get('/viewPredictions', async (req, res) => {
 
             predictions = predictionUtils.mapScheduleToPrediction(schedules, predictions, req, matchDay);
 
+            predictionUtils.mapPredictionsToSchedule(predictions, schedules);
+            predictionUtils.validatePredictionDeadline(predictions);
+
             res.render('predictions/userPrediction', {
                 title: 'User Predictions ',
                 team: loginDetails.team,
