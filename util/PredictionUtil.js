@@ -712,6 +712,34 @@ function clientTimeZoneMoment(date, clientTimeZone) {
     return mom(date).tz(clientTimeZone).format("YYYY-MM-DD HH:mm:ss");
 }
 
+exports.generateClientTimeZone = function generateClientTimeZone(gameWeekSchedule, req){
+    //var format = 'YYYY/MM/DD HH:mm:ss ZZ';
+    let clientTimeZone = req.cookies.clientOffset;
+    gameWeekSchedule.forEach(game => {
+        /*let format = 'lll';*/
+        let format = 'MMM DD YYYY, hh:mm:ss A';
+        let date = new Date(game.deadline);
+        game.localDate = mom(date).tz(clientTimeZone).format(format);
+
+        if (game.predictedTime != 'N/A'){
+            let format = 'MMM DD YYYY, hh:mm:ss A';
+            let date = new Date(game.predictedTime);
+            game.predictedTime = mom(date).tz(clientTimeZone).format(format);
+        }
+    });
+}
+
+exports.generateClientTimeZoneSingle = function generateClientTimeZoneSingle(deadline, req){
+    let clientTimeZone = req.cookies.clientOffset;
+
+        /*let format = 'lll';*/
+        let format = 'MMM DD YYYY, hh:mm:ss A';
+        let date = new Date(deadline);
+        return mom(date).tz(clientTimeZone).format(format);
+
+}
+
+
 exports.setMatchAmounts = function setMatchAmounts(schedule) {
     if (schedule.length > 0) {
         schedule.forEach(match => {

@@ -57,6 +57,7 @@ exports.predictions = app.get('/predictions', async (req, res) => {
             let userPredictions = await predictionUtils.getMatchdayPredictions(connection, loginDetails.memberId);
             if (userPredictions.size > 0) {
                 predictionUtils.mapPredictionsToSchedule(userPredictions, gameWeekSchedule);
+                predictionUtils.generateClientTimeZone(gameWeekSchedule, req);
             }
 
             res.render('predictions/prediction', {
@@ -107,6 +108,7 @@ exports.viewPredictions = app.get('/viewPredictions', async (req, res) => {
 
             predictionUtils.mapPredictionsToSchedule(predictions, schedules);
             predictionUtils.validatePredictionDeadline(predictions);
+            predictionUtils.generateClientTimeZone(predictions, req);
 
             res.render('predictions/userPrediction', {
                 title: 'User Predictions ',
@@ -151,7 +153,7 @@ exports.predict = app.get('/predict/:matchNumber/:memberId/:matchDay/:type', asy
 
             let matchDeadline;
             if (schedule.length > 0) {
-                matchDeadline = schedule[0].deadline;
+                matchDeadline = predictionUtils.generateClientTimeZoneSingle(schedule[0].deadline, req);
                 predictionUtils.setMatchAmounts(schedule);
             }
 
@@ -195,7 +197,7 @@ exports.predictPerGame = app.get('/predictGame/:matchNumber/:memberId/:matchDay/
             }
 
             if (schedule.length > 0) {
-                matchDeadline = schedule[0].deadline;
+                matchDeadline = predictionUtils.generateClientTimeZoneSingle(schedule[0].deadline, req);
             }
             res.cookie('schedule', schedule, {expires: new Date(Date.now() + 100 * 60000), httpOnly: true});
             predictionUtils.setMatchAmounts(schedule);
@@ -415,7 +417,7 @@ exports.updatePredictions = app.get('/updatePredictions/:matchNumber/:memberId/:
         let matchDeadline;
 
         if (schedule.length > 0) {
-            matchDeadline = schedule[0].deadline;
+            matchDeadline = predictionUtils.generateClientTimeZoneSingle(schedule[0].deadline, req);
         }
 
         let msg;
