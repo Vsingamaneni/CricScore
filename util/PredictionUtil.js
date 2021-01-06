@@ -729,6 +729,18 @@ exports.generateClientTimeZone = function generateClientTimeZone(gameWeekSchedul
     });
 }
 
+exports.generateClientTimeZoneForPredictedTimw = function generateClientTimeZoneForPredictedTimw(gameWeekSchedule, req){
+    //var format = 'YYYY/MM/DD HH:mm:ss ZZ';
+    let clientTimeZone = req.cookies.clientOffset;
+    gameWeekSchedule.forEach(game => {
+        if (game.predictedTime != 'N/A'){
+            let format = 'MMM DD YYYY, hh:mm:ss A';
+            let date = new Date(game.predictedTime);
+            game.predictedTime = mom(date).tz(clientTimeZone).format(format);
+        }
+    });
+}
+
 exports.generateClientTimeZoneSingle = function generateClientTimeZoneSingle(deadline, req){
     let clientTimeZone = req.cookies.clientOffset;
 

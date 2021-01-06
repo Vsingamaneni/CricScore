@@ -108,7 +108,7 @@ exports.viewPredictions = app.get('/viewPredictions', async (req, res) => {
 
             predictionUtils.mapPredictionsToSchedule(predictions, schedules);
             predictionUtils.validatePredictionDeadline(predictions);
-            predictionUtils.generateClientTimeZone(predictions, req);
+            predictionUtils.generateClientTimeZoneForPredictedTimw(predictions, req);
 
             res.render('predictions/userPrediction', {
                 title: 'User Predictions ',
