@@ -3,31 +3,31 @@ const mysql = require('mysql');
 var connection;
 
 // Localhost DB config
-module.exports = {
-    dbConnection: function () {
-        connection = mysql.createConnection({
-            host:'localhost',
-            user:'root',
-            password:'Sweety143:',
-            database:'react'
-        });
-        return connection;
-    }
-};
-
-
-// // AWS DB Config
 // module.exports = {
 //     dbConnection: function () {
 //         connection = mysql.createConnection({
-//                 host:'premierleague.cxn0nyuxcvwi.us-east-2.rds.amazonaws.com',
-//                 user:'root',
-//                 password:'premier_league',
-//                 database:'premier_league'
+//             host:'localhost',
+//             user:'root',
+//             password:'Sweety143:',
+//             database:'react'
 //         });
 //         return connection;
 //     }
 // };
+
+
+// // AWS DB Config
+module.exports = {
+    dbConnection: function () {
+        connection = mysql.createConnection({
+                host:'premierleague.cxn0nyuxcvwi.us-east-2.rds.amazonaws.com',
+                user:'root',
+                password:'premier_league',
+                database:'react'
+        });
+        return connection;
+    }
+};
 
 /*// Google Cloud DB Config
 module.exports = {
