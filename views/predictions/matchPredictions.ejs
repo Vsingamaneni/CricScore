@@ -59,8 +59,9 @@
                 <tr style="background-color: #5b5d5d;font-size: 18px;">
                     <th><i>#</i></th>
                     <th><i>GAME</i></th>
-                    <th><i>DEADLINE</i></th>
+                    <!--<th><i>DEADLINE</i></th>-->
                     <th><i>CHOICE</i></th>
+                    <th><i>AMOUNT</i></th>
                     <th><i>ACTION</i></th>
                 </tr>
                 </thead>
@@ -69,7 +70,8 @@
                     <tr>
                         <td><%= match.matchNumber %></td>
                         <td><%= match.homeTeam %> vs <%= match.awayTeam %></td>
-                        <td><%= match.deadline %></td>
+                        <!--<td><%= match.deadline %></td>-->
+                        <!-- Displays Selected Choice / Allows choice to select Team -->
                         <% if (match.predictionFound) { %>
                             <td>
                                 <%= match.selected %>
@@ -78,18 +80,32 @@
                         <% if (!match.predictionFound) { %>
                         <td> <select name="selected" style="background-color: #f1f4f5; color:black; padding: 6px 10px;margin: 8px 0; display: inline-block;border: 1px solid #ccc;border-radius: 4px; box-sizing: border-box; font-size: 15px; font-weight: 900;" required>
                                 <option style="margin: 0 auto;">--- Select Team ---</option>
-                                <option><%= match.homeTeam %></option>
-                                <option><%= match.awayTeam %></option>
+                                <option style="text-align:center;"><%= match.homeTeam %></option>
+                                <option style="text-align:center;"><%= match.awayTeam %></option>
                             </select>
                         </td>
                         <% } %>
+
+                        <!-- Displays Selected Amount / Allows choice to select Amount -->
                         <% if (!match.predictionFound) { %>
+                        <td><select name="amount" style="background-color: #f1f4f5; color:black; padding: 6px 10px;margin: 8px 0; display: inline-block;border: 1px solid #ccc;border-radius: 4px; box-sizing: border-box; font-size: 15px; font-weight: 900;" required>
+                                <option style="margin: 0 auto;">--- Select Amount ---</option>
+                                <% for(var i = 0; i < match.amounts.length; i++) { %>
+                                <option style="text-align:center;"><%= match.amounts[i] %></option>
+                                <% } %>
+                            </select></td>
                         <td style="text-align:center;">
                             <button type="submit" class="btn-primary" style= "border-radius: 8px;"><a
                                         style="color:white;font-size:15px;text-decoration:none;/*font-family:Comic Sans MS*/">PREDICT</a>
                             </button>
                         </td>
                         <% } %>
+                        <% if (match.predictionFound) { %>
+                            <td>
+                                <%= match.amount %>
+                            </td>
+                        <% } %>
+
                         <% if (match.predictionFound) { %>
                             <td style="text-align:center;">
                                 -

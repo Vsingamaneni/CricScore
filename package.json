@@ -12,6 +12,7 @@
     "bcrypt": "^5.0.0",
     "body-parser": "^1.19.0",
     "cookie-parser": "^1.4.5",
+    "date-and-time": "^0.14.2",
     "dateformat": "^4.3.1",
     "ejs": "^2.7.1",
     "express": "^4.17.1",
@@ -22,6 +23,7 @@
     "moment": "^2.29.1",
     "moment-timezone": "^0.5.32",
     "mysql": "^2.17.1",
-    "nodemon": "^2.0.6"
+    "nodemon": "^2.0.6",
+    "sort-map": "^1.0.0"
   }
 }

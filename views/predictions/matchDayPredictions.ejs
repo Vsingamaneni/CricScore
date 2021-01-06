@@ -5,72 +5,294 @@
     <link rel="stylesheet" href="/css/dashboard.css">
     <link rel="stylesheet" href="/css/schedule.css">
     <%- include('../header.ejs') %>
-    <style>
-         input[type=submit] {
-            background-color: #343a40;
-            border: none;
-            color: #19B3D3;
-            padding: 16px 32px;
-            text-decoration: none;
-            margin: 4px 2px;
-            cursor: pointer;
-            border-radius: 12px;
-            font-size: 15px;
-            font-weight: 900;
-            font-family: "Roboto", sans-serif;
-        }
-    </style>
 </head>
 <body style="background-color: #f6f7fa;">
-
 
 <div>
     <%- include('../body.ejs') %>
     <div class="content" style="background-color:#f6f7fa">
         <br><br><br><br>
         <br><br><br><br>
-<!--        <div style="width: 100px; margin-left: auto; margin-right: auto;">
-            <input type="submit" value="Deadline : Dec 15, 2020 18:00:00 ">
-        </div>-->
-        <h1 style="text-align: center; color: #19B3D3;">Deadline : <i><%= matchDeadline%> </i></h1>
+
         <div class="container">
+            <% if(typeof alert != 'undefined') { %>
+                <br/>
+                <% alert.forEach(function(error) { %>
+                    <div style="color:red;text-align: center;font-size: 15px; font-weight: 900; font-family: Roboto, sans-serif;"
+                         role="alert">
+                        <%= error.msg %>
+                    </div>
+                    <br><br><br>
+                <% }) %>
+            <% } %>
+            <% if(typeof msg != 'undefined') { %>
+                <br/>
+                <% msg.forEach(function(success) { %>
+                        <div style="margin: 0 auto; text-align: center; width: 50%; font-size: 20px; border: 2px solid #29dd9e; padding: 10px; border-radius: 50px 20px;">
+                            <p><%= success %></p>
+                        </div>
+                    <br><br><br>
+                <% }) %>
+            <% } %>
+            <% if(typeof fail != 'undefined') { %>
+                <br/>
+                <% fail.forEach(function(failed) { %>
+                    <div style="color:#ec1022;text-align: center;font-size: 25px; font-weight: 900; font-family: Roboto, sans-serif;"
+                         role="alert">
+                        <%= failed %>
+                    </div>
+                    <br><br><br>
+                <% }) %>
+            <% } %>
 
-            <form autocomplete="off" action="/savePredictions/<%= matchDay %>" method="POST">
-
-            <table class="table table-dark table-striped">
-                <thead>
-                <tr>
-                    <th><i>#</i></th>
-                    <th><i>Game</i></th>
-                    <th><i>Deadline</i></th>
-                    <th><i>Select</i></th>
-                    <!--<th><i>Action</i></th>-->
-                </tr>
-                </thead>
-                <tbody>
-                <tr style="height: 10px;"></tr>
-                <% schedule.forEach(function(match){ %>
+            <% matchDayPredictions.forEach(function(matchDay){ %>
+                <!--<table style="margin:0 auto;  border: 1px solid black;border-collapse: collapse;background-color: #31b0d5;color:white;">
                     <tr>
-                        <td><%= match.matchNumber %></td>
-                        <td><%= match.homeTeam %> vs <%= match.awayTeam %></td>
-                        <td><%= match.deadline %></td>
-                        <td> <select name="selected<%= match.matchNumber %>" style="background-color: #f1f4f5; color:black; padding: 6px 10px;margin: 8px 0; display: inline-block;border: 1px solid #ccc;border-radius: 4px; box-sizing: border-box; font-size: 15px; font-weight: 900;" required>
-                                <option style="margin: 0 auto;">--- Select Team ---</option>
-                                <option><%= match.homeTeam %></option>
-                                <option><%= match.awayTeam %></option>
-                            </select>
+                        <td style="padding: 5px;font-size:20px;border: 1px solid black;">
+                            <p style="text-align:center;">SRH</p>
+                            <table style="margin:0 auto;border: 1px solid black;">
+                                <tr style="text-align:center;">
+                                    <td style="padding: 5px;font-size:20px;border: 1px solid black;">Amount</td>
+                                    <td style="padding: 5px;font-size:20px;border: 1px solid black;">Count</td>
+                                    <td style="padding: 5px;font-size:20px;border: 1px solid black;">Expected</td>
+                                    <td style="padding: 5px;font-size:20px;border: 1px solid black;">Members</td>
+                                </tr>
+                                <tr style="text-align:center;">
+                                    <td style="padding: 5px;font-size:20px;border: 1px solid black;">10</td>
+                                    <td style="padding: 5px;font-size:20px;border: 1px solid black;">10</td>
+                                    <td style="padding: 5px;font-size:20px;border: 1px solid black;">10</td>
+                                    <td style="padding: 5px;font-size:20px;border: 1px solid black;">
+                                        <details>
+                                            <summary>Selected</summary>
+                                            <ui style = "list-style-type: square; text-align: left;">
+                                                <br>
+                                                <li style="font-size: 18px;">Vamsi Singamaneni</li>
+                                                <li style="font-size: 18px;">Sowmya Narra</li>
+                                                <li style="font-size: 18px;">Srikanth Yadaram</li>
+                                            </ui>
+                                        </details>
+                                    </td>
+                                </tr>
+                                <tr style="text-align:center;">
+                                    <td style="padding: 5px;font-size:20px;border: 1px solid black;">10</td>
+                                    <td style="padding: 5px;font-size:20px;border: 1px solid black;">10</td>
+                                    <td style="padding: 5px;font-size:20px;border: 1px solid black;">10</td>
+                                    <td style="padding: 5px;font-size:20px;border: 1px solid black;">
+                                        <details>
+                                            <summary>Selected</summary>
+                                            <ui style = "list-style-type: square; text-align: left;">
+                                                <br>
+                                                <li style="font-size: 18px;">Vamsi Singamaneni</li>
+                                                <li style="font-size: 18px;">Sowmya Narra</li>
+                                                <li style="font-size: 18px;">Srikanth Yadaram</li>
+                                            </ui>
+                                        </details>
+                                    </td>
+                                </tr>
+                                <tr style="text-align:center;">
+                                    <td style="padding: 5px;font-size:20px;border: 1px solid black;">10</td>
+                                    <td style="padding: 5px;font-size:20px;border: 1px solid black;">10</td>
+                                    <td style="padding: 5px;font-size:20px;border: 1px solid black;">10</td>
+                                    <td style="padding: 5px;font-size:20px;border: 1px solid black;">
+                                        <details>
+                                            <summary>Selected</summary>
+                                            <ui style = "list-style-type: square; text-align: left;">
+                                                <br>
+                                                <li style="font-size: 18px;">Vamsi Singamaneni</li>
+                                                <li style="font-size: 18px;">Sowmya Narra</li>
+                                                <li style="font-size: 18px;">Srikanth Yadaram</li>
+                                            </ui>
+                                        </details>
+                                    </td>
+                                </tr>
+                            </table>
+                        </td>
+                        <td style="padding: 5px;font-size:20px;border: 1px solid black;">
+                            <p style="text-align:center;">RR</p>
+                            <table style="margin:0 auto;border: 1px solid black;">
+                                <tr style="text-align:center;">
+                                    <td style="padding: 5px;font-size:20px;border: 1px solid black;">Amount</td>
+                                    <td style="padding: 5px;font-size:20px;border: 1px solid black;">Count</td>
+                                    <td style="padding: 5px;font-size:20px;border: 1px solid black;">Expected</td>
+                                    <td style="padding: 5px;font-size:20px;border: 1px solid black;">Members</td>
+                                </tr>
+                                <tr style="text-align:center;">
+                                    <td style="padding: 5px;font-size:20px;border: 1px solid black;">10</td>
+                                    <td style="padding: 5px;font-size:20px;border: 1px solid black;">10</td>
+                                    <td style="padding: 5px;font-size:20px;border: 1px solid black;">10</td>
+                                    <td style="padding: 5px;font-size:20px;border: 1px solid black;">
+                                        <details>
+                                            <summary>Selected</summary>
+                                            <ui style = "list-style-type: square; text-align: left;">
+                                                <br>
+                                                <li style="font-size: 18px;">Vamsi Singamaneni</li>
+                                                <li style="font-size: 18px;">Sowmya Narra</li>
+                                                <li style="font-size: 18px;">Srikanth Yadaram</li>
+                                            </ui>
+                                        </details>
+                                    </td>
+                                </tr>
+                                <tr style="text-align:center;">
+                                    <td style="padding: 5px;font-size:20px;border: 1px solid black;">10</td>
+                                    <td style="padding: 5px;font-size:20px;border: 1px solid black;">10</td>
+                                    <td style="padding: 5px;font-size:20px;border: 1px solid black;">10</td>
+                                    <td style="padding: 5px;font-size:20px;border: 1px solid black;">
+                                        <details>
+                                            <summary>Selected</summary>
+                                            <ui style = "list-style-type: square; text-align: left;">
+                                                <br>
+                                                <li style="font-size: 18px;">Vamsi Singamaneni</li>
+                                                <li style="font-size: 18px;">Sowmya Narra</li>
+                                                <li style="font-size: 18px;">Srikanth Yadaram</li>
+                                            </ui>
+                                        </details>
+                                    </td>
+                                </tr>
+                            </table>
                         </td>
                     </tr>
-                    <tr style="height: 20px;"></tr>
-                <% }); %>
-                </tbody>
-            </table>
-                <!--
-                    <div style="width: 100px; margin-left: auto; margin-right: auto;color: white;">
-                        <input type="submit" value="SUBMIT">
-                    </div>
-                 -->
-            </form>
+
+                </table>-->
+                <h1 style="text-align: center; color: #19B3D3;">Match : <i><%= matchDay.schedule.homeTeam %> vs <%= matchDay.schedule.awayTeam %> </i></h1>
+                <h1 style="text-align: center; color: #19B3D3;">Deadline : <i><%= matchDay.schedule.localDate %> </i></h1>
+                <table class="table table-dark table-striped" style="width: 25%;font-size:20px;font-family: Arial, Helvetica, sans-serif;">
+                        <tr style="text-align:center;background-color: #5b5d5d;font-size: 18px;">
+                            <td><i>ACTIVE USERS</i></td>
+                            <td><i>PREDICTED</i></td>
+                            <td><i>DEFAULT</i></td>
+                        </tr>
+                        <tr>
+                            <td style="padding: 5px;font-size:20px;border: 1px solid black;"><%= matchDay.userDetails.total %></td>
+                            <td style="padding: 5px;font-size:20px;border: 1px solid black;"><%= matchDay.userDetails.predicted %></td>
+                            <td style="padding: 5px;font-size:20px;border: 1px solid black;"><%= matchDay.userDetails.defaultCount %></td>
+                        </tr>
+                    </table>
+                    <table class="table table-dark table-striped" style="width: 50%;font-size:20px;font-family: Arial, Helvetica, sans-serif;">
+                        <tr style="text-align:center;background-color: #5b5d5d;font-size: 18px;">
+                            <td><i>#</i></td>
+                            <td><i>NAME</i></td>
+                            <td><i>GAME</i></td>
+                            <td><i>SELECTED</i></td>
+                            <td><i>BET</i></td>
+                            <td><i>EXPECTED</i></td>
+                        </tr>
+                        <tr>
+                            <td style="padding: 5px;font-size:20px;border: 1px solid black;"><%= matchDay.currentUserPrediction.matchNumber %></td>
+                            <td style="padding: 5px;font-size:20px;border: 1px solid black;"><%= matchDay.currentUserPrediction.firstName %></td>
+                            <td style="padding: 5px;font-size:20px;border: 1px solid black;"><%= matchDay.schedule.homeTeam %> vs <%= matchDay.schedule.awayTeam %></td>
+                            <td style="padding: 5px;font-size:20px;border: 1px solid black;"><%= matchDay.currentUserPrediction.selected %></td>
+                            <td style="padding: 5px;font-size:20px;border: 1px solid black;"><%= matchDay.currentUserPrediction.amount %></td>
+                            <td style="padding: 5px;font-size:20px;border: 1px solid black;"><%= matchDay.currentUserPrediction.winning %></td>
+                        </tr>
+                    </table>
+                <table class="table table-dark table-striped">
+                    <tr>
+                        <td style="padding: 5px;font-size:20px;border: 1px solid black;">
+                            <p style="text-align:center;"><%= matchDay.schedule.homeTeam %></p>
+                            <table style="margin:0 auto;border: 1px solid black;">
+                                <tr style="text-align:center;background-color: #5b5d5d;font-size: 18px;">
+                                    <td style="padding: 5px;font-size:20px;border: 1px solid black;">Amount</td>
+                                    <td style="padding: 5px;font-size:20px;border: 1px solid black;">Count</td>
+                                    <td style="padding: 5px;font-size:20px;border: 1px solid black;">Expected</td>
+                                    <td style="padding: 5px;font-size:20px;border: 1px solid black;">Members</td>
+                                </tr>
+                                <% for (const [key, value] of matchDay.homeTeam.entries()) { %>
+                                        <tr style="text-align:center;">
+                                            <td style="padding: 5px;font-size:20px;border: 1px solid black;"><%= key %></td>
+                                            <td style="padding: 5px;font-size:20px;border: 1px solid black;"><%= value.count %></td>
+                                            <td style="padding: 5px;font-size:20px;border: 1px solid black;"><%= value.winning %></td>
+                                            <td style="padding: 5px;font-size:20px;border: 1px solid black;">
+                                                <details>
+                                                    <summary>View</summary>
+                                                    <ui style="list-style-type: square; text-align: left;">
+                                                        <br>
+                                                        <% value.members.forEach(function(member){ %>
+                                                            <li style="font-size: 18px;"><%= member %></li>
+                                                        <% }); %>
+                                                    </ui>
+                                                </details>
+                                            </td>
+                                        </tr>
+                                <% } %>
+                            </table>
+                        </td>
+                        <td style="padding: 5px;font-size:20px;border: 1px solid black;">
+                            <p style="text-align:center;"><%= matchDay.schedule.awayTeam %></p>
+                            <table style="margin:0 auto;border: 1px solid black;">
+                                <tr style="text-align:center;background-color: #5b5d5d;font-size: 18px;">
+                                    <td style="padding: 5px;font-size:20px;border: 1px solid black;">Amount</td>
+                                    <td style="padding: 5px;font-size:20px;border: 1px solid black;">Count</td>
+                                    <td style="padding: 5px;font-size:20px;border: 1px solid black;">Expected</td>
+                                    <td style="padding: 5px;font-size:20px;border: 1px solid black;">Members</td>
+                                </tr>
+                                <% for (const [key, value] of matchDay.awayTeam.entries()) { %>
+                                    <tr style="text-align:center;">
+                                        <td style="padding: 5px;font-size:20px;border: 1px solid black;"><%= key %></td>
+                                        <td style="padding: 5px;font-size:20px;border: 1px solid black;"><%= value.count %></td>
+                                        <td style="padding: 5px;font-size:20px;border: 1px solid black;"><%= value.winning %></td>
+                                        <td style="padding: 5px;font-size:20px;border: 1px solid black;">
+                                            <details>
+                                                <summary>View</summary>
+                                                <ui style="list-style-type: square; text-align: left;">
+                                                    <br>
+                                                    <% value.members.forEach(function(member){ %>
+                                                        <li style="font-size: 18px;"><%= member %></li>
+                                                    <% }); %>
+                                                </ui>
+                                            </details>
+                                        </td>
+                                    </tr>
+                                <% } %>
+                            </table>
+                        </td>
+                        <!--<td style="padding: 5px;font-size:20px;border: 1px solid black;">
+                            <p style="text-align:center;">RR</p>
+                            <table style="margin:0 auto;border: 1px solid black;">
+                                <tr style="text-align:center;">
+                                    <td style="padding: 5px;font-size:20px;border: 1px solid black;">Amount</td>
+                                    <td style="padding: 5px;font-size:20px;border: 1px solid black;">Count</td>
+                                    <td style="padding: 5px;font-size:20px;border: 1px solid black;">Expected</td>
+                                    <td style="padding: 5px;font-size:20px;border: 1px solid black;">Members</td>
+                                </tr>
+                                <tr style="text-align:center;">
+                                    <td style="padding: 5px;font-size:20px;border: 1px solid black;">10</td>
+                                    <td style="padding: 5px;font-size:20px;border: 1px solid black;">10</td>
+                                    <td style="padding: 5px;font-size:20px;border: 1px solid black;">10</td>
+                                    <td style="padding: 5px;font-size:20px;border: 1px solid black;">
+                                        <details>
+                                            <summary>Selected</summary>
+                                            <ui style="list-style-type: square; text-align: left;">
+                                                <br>
+                                                <li style="font-size: 18px;">Vamsi Singamaneni</li>
+                                                <li style="font-size: 18px;">Sowmya Narra</li>
+                                                <li style="font-size: 18px;">Srikanth Yadaram</li>
+                                            </ui>
+                                        </details>
+                                    </td>
+                                </tr>
+                                <tr style="text-align:center;">
+                                    <td style="padding: 5px;font-size:20px;border: 1px solid black;">10</td>
+                                    <td style="padding: 5px;font-size:20px;border: 1px solid black;">10</td>
+                                    <td style="padding: 5px;font-size:20px;border: 1px solid black;">10</td>
+                                    <td style="padding: 5px;font-size:20px;border: 1px solid black;">
+                                        <details>
+                                            <summary>Selected</summary>
+                                            <ui style="list-style-type: square; text-align: left;">
+                                                <br>
+                                                <li style="font-size: 18px;">Vamsi Singamaneni</li>
+                                                <li style="font-size: 18px;">Sowmya Narra</li>
+                                                <li style="font-size: 18px;">Srikanth Yadaram</li>
+                                            </ui>
+                                        </details>
+                                    </td>
+                                </tr>
+                            </table>
+                        </td>-->
+                    </tr>
+                </table>
+
+                <br><br><br><br>
+            <% }); %>
         </div>
 
     </div>

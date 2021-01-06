@@ -34,6 +34,7 @@
                     <th><i>DEADLINE</i></th>
                     <th><i>PREDICTED TIME</i></th>
                     <th><i>SELECTED</i></th>
+                    <th><i>BET</i></th>
                     <th><i>ACTION</i></th>
                 </tr>
                 </thead>
@@ -43,9 +44,10 @@
                     <tr style="font-size: 18px;">
                         <td><%= match.matchNumber %></td>
                         <td><%= match.game %></td>
-                        <td><%= match.deadline %></td>
+                        <td><%= match.localDate %></td>
                         <td><%= match.predictedTime %></td>
                         <td><%= match.selected %></td>
+                        <td><%= match.amount %></td>
                         <td>
                             <% if (match.isDeadlineReached) { %>
                                 <% if (match.allow !== undefined && match.allow) { %>

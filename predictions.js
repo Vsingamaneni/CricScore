@@ -2,7 +2,11 @@ const path = require('path');
 const express = require('express');
 const bodyParser = require('body-parser');
 let predictionUtils = require('./util/PredictionUtil');
-var db = require('./db');
+let matchDayUtils = require('./util/MatchDayPredictionsUtil');
+let userList = require('./util/users');
+let db = require('./db');
+const dateAndTime = require('date-and-time');
+const pattern = dateAndTime.compile('MMM DD YYYY, hh:mm:ss A');
 
 const urlencodedParser = bodyParser.urlencoded({extended: false})
 const {check, validationResult} = require('express-validator')
@@ -49,14 +53,11 @@ exports.predictions = app.get('/predictions', async (req, res) => {
             let includeFinishedGames = false;
             let gameWeekSchedule = predictionUtils.predictionDetails(predictionUtils.mapSchedule(schedule, includeFinishedGames));
 
-            // Check for current active predictions and block prediction again.
             /*let matchDay = await predictionUtils.getActiveMatchDay(connection);*/
             let userPredictions = await predictionUtils.getMatchdayPredictions(connection, loginDetails.memberId);
-            if (userPredictions.size > 0 ){
+            if (userPredictions.size > 0) {
                 predictionUtils.mapPredictionsToSchedule(userPredictions, gameWeekSchedule);
             }
-
-            predictionUtils.validateDeadline(gameWeekSchedule);
 
             res.render('predictions/prediction', {
                 title: 'Predictions ',
@@ -86,8 +87,14 @@ exports.viewPredictions = app.get('/viewPredictions', async (req, res) => {
             let type = 'single';
             let loginDetails = JSON.parse(req.cookies.loginDetails);
 
+            let msg;
+            if (undefined != req.cookies.msg) {
+                msg = req.cookies.msg;
+                res.cookie('msg', null, {expires: new Date(Date.now() + 0 * 0), httpOnly: true});
+            }
+
             let schedules = await predictionUtils.sortSchedule(connection);
-            let matchDay = 100;
+            let matchDay = 0;
             schedules.forEach(schedule => {
                 if (schedule.isActive) {
                     matchDay = schedule.matchDay;
@@ -96,9 +103,7 @@ exports.viewPredictions = app.get('/viewPredictions', async (req, res) => {
 
             let predictions = await predictionUtils.userPredictions(connection, loginDetails.memberId, matchDay);
 
-            predictions = predictionUtils.mapScheduleToPrediction(schedules, predictions, req);
-
-            predictionUtils.validateDeadline(predictions);
+            predictions = predictionUtils.mapScheduleToPrediction(schedules, predictions, req, matchDay);
 
             res.render('predictions/userPrediction', {
                 title: 'User Predictions ',
@@ -106,7 +111,8 @@ exports.viewPredictions = app.get('/viewPredictions', async (req, res) => {
                 fname: loginDetails.fName,
                 memberId: loginDetails.memberId,
                 viewPredictions: predictions,
-                type: type
+                type: type,
+                msg: msg
             });
 
         } else {
@@ -143,7 +149,9 @@ exports.predict = app.get('/predict/:matchNumber/:memberId/:matchDay/:type', asy
             let matchDeadline;
             if (schedule.length > 0) {
                 matchDeadline = schedule[0].deadline;
+                predictionUtils.setMatchAmounts(schedule);
             }
+
             res.cookie('schedule', schedule, {expires: new Date(Date.now() + 100 * 60000), httpOnly: true});
 
             return res.render('predictions/matchPredictions', {
@@ -162,7 +170,7 @@ exports.predict = app.get('/predict/:matchNumber/:memberId/:matchDay/:type', asy
         return res.render('login/login', {
             title: 'Scoreboard'
         });
-    }catch (e){
+    } catch (e) {
         console.log('error processing single predictions', e);
         res.redirect('/login');
     }
@@ -177,10 +185,17 @@ exports.predictPerGame = app.get('/predictGame/:matchNumber/:memberId/:matchDay/
             let schedule = await predictionUtils.getMatchSchedule(connection, matchNumber);
             let matchDeadline;
 
+            let alert;
+            if (undefined != req.cookies.alert) {
+                alert = req.cookies.alert;
+                res.cookie('alert', null, {expires: new Date(Date.now() + 0 * 0), httpOnly: true});
+            }
+
             if (schedule.length > 0) {
                 matchDeadline = schedule[0].deadline;
             }
             res.cookie('schedule', schedule, {expires: new Date(Date.now() + 100 * 60000), httpOnly: true});
+            predictionUtils.setMatchAmounts(schedule);
 
             return res.render('predictions/matchPredictions', {
                 title: 'Match Predictions',
@@ -189,13 +204,14 @@ exports.predictPerGame = app.get('/predictGame/:matchNumber/:memberId/:matchDay/
                 schedule: schedule,
                 memberId: loginDetails.memberId,
                 matchDeadline: matchDeadline,
-                type: type
+                type: type,
+                alert: alert
             });
         }
         return res.render('login/login', {
             title: 'Scoreboard'
         });
-    } catch (e){
+    } catch (e) {
         console.log('error processing predictions', e);
         res.redirect('/login');
     }
@@ -209,7 +225,7 @@ exports.savePredictions = app.post('/savePredictions/:matchDay', urlencodedParse
             const matchDay = req.params.matchDay;
 
             if (!predictionUtils.validateMatchDay(req, matchDay)) {
-                throw new Error('You are trying to select wrong matches' );
+                throw new Error('You are trying to select wrong matches');
             }
 
             if (!predictionUtils.validateMemberPredictions(req)) {
@@ -240,7 +256,7 @@ exports.savePredictions = app.post('/savePredictions/:matchDay', urlencodedParse
                 return res.redirect('/predictions');
             }
         }
-    }catch (e){
+    } catch (e) {
         console.log('error processing predictions save', e);
         res.redirect('/login');
     }
@@ -252,7 +268,7 @@ exports.saveSinglePredictions = app.post('/savePredictions/:matchNumber/:memberI
             const matchNumber = req.params.matchNumber;
 
             if (!predictionUtils.validateMemberSinglePrediction(req, matchNumber)) {
-                throw new Error('You must select team for match # : ' + matchNumber);
+                throw new Error('You must select team and amount for match # : ' + matchNumber);
             }
             return true;
         })
@@ -269,7 +285,12 @@ exports.saveSinglePredictions = app.post('/savePredictions/:matchNumber/:memberI
             const alert = errors.array();
             res.cookie('schedule', null, {expires: new Date(Date.now() + 0 * 0), httpOnly: true});
             res.cookie('alert', alert, {expires: new Date(Date.now() + 60 * 60000), httpOnly: true});
-            return res.redirect('/predict/' + matchNumber + "/" + memberId + "/" + matchDay + "/" + type);
+            if (type == 'all') {
+                return res.redirect('/predict/' + matchNumber + "/" + memberId + "/" + matchDay + "/" + type);
+            } else {
+                return res.redirect('/predictGame/' + matchNumber + "/" + memberId + "/" + matchDay + "/" + type);
+            }
+
         } else {
             const matchNumber = req.params.matchNumber;
             try {
@@ -299,7 +320,7 @@ exports.saveSinglePredictions = app.post('/savePredictions/:matchNumber/:memberI
                 return res.redirect('/predictions');
             }
         }
-    }catch (e){
+    } catch (e) {
         console.log('error processing predictions save', e);
         res.redirect('/login');
     }
@@ -311,7 +332,7 @@ exports.updateSinglePredictions = app.post('/updateSinglePredictions/:matchNumbe
             const matchNumber = req.params.matchNumber;
 
             if (!predictionUtils.validateMemberSinglePrediction(req, matchNumber)) {
-                throw new Error('You must select team for match # : ' + matchNumber);
+                throw new Error('You must select team and amount for match # : ' + matchNumber);
             }
             return true;
         })
@@ -362,7 +383,7 @@ exports.updateSinglePredictions = app.post('/updateSinglePredictions/:matchNumbe
                 return res.redirect('/predictions');
             }
         }
-    } catch (e){
+    } catch (e) {
         console.log('error processing update predictions', e);
         res.redirect('/login');
     }
@@ -377,7 +398,7 @@ exports.updatePredictions = app.get('/updatePredictions/:matchNumber/:memberId/:
         const type = req.params.type;
         let schedule = [];
         let predictions = [];
-        if (type == 'all'){
+        if (type == 'all') {
             schedule = await predictionUtils.getMatchdaySchedule(connection, matchDay, req);
             predictions = await predictionUtils.userPredictions(connection, loginDetails.memberId, matchDay);
 
@@ -386,11 +407,11 @@ exports.updatePredictions = app.get('/updatePredictions/:matchNumber/:memberId/:
             predictions = await predictionUtils.retrievePrediction(connection, loginDetails.memberId, matchId);
         }
 
-        predictions = predictionUtils.mapScheduleToPrediction(schedule, predictions, req);
+        predictions = predictionUtils.mapScheduleToPrediction(schedule, predictions, req, matchDay);
 
         let matchDeadline;
 
-        if (schedule.length > 0){
+        if (schedule.length > 0) {
             matchDeadline = schedule[0].deadline;
         }
 
@@ -405,6 +426,8 @@ exports.updatePredictions = app.get('/updatePredictions/:matchNumber/:memberId/:
             alert = req.cookies.alert;
             res.cookie('alert', null, {expires: new Date(Date.now() + 0 * 0), httpOnly: true});
         }
+
+        predictionUtils.setMatchAmounts(predictions);
 
         res.cookie('schedule', schedule, {expires: new Date(Date.now() + 100 * 60000), httpOnly: true});
 
@@ -429,5 +452,77 @@ exports.updatePredictions = app.get('/updatePredictions/:matchNumber/:memberId/:
 exports.updatePredictionsPost = app.post('/updatePredictions/:matchNumber/:memberId/:matchDay/:type', async (req, res) => {
 
     return res.redirect('/updatePredictions/:matchNumber/:memberId/:matchDay/:type');
+});
+
+exports.matchDayPredictions = app.get('/matchDayPredictions', async (req, res) => {
+    try {
+        if (req.cookies.loginDetails) {
+            let loginDetails = JSON.parse(req.cookies.loginDetails);
+            let matchDaySchedule = await predictionUtils.getActiveMatchDaySchedule(connection);
+            predictionUtils.validateMatchDeadline(matchDaySchedule);
+            let matchIds = [];
+            if (matchDaySchedule.length > 0) {
+                matchDaySchedule.forEach(function (item) {
+                    if (item.winner == null) {
+                        let date = new Date(item.deadline);
+                        item.localDate = dateAndTime.format(date, pattern);
+                        matchIds.push(item);
+                    }
+                });
+            }
+            let memberId = loginDetails.memberId;
+            let users = [];
+            let matchDayPredictions = [];
+            let singleMatchPredictions = [];
+            let msg = [];
+            if (matchIds.length == 0) {
+                let message = "No active matches";
+                msg.push(message);
+            } else {
+                if (loginDetails.role == 'member') {
+                    for (const match of matchIds) {
+                        if (match.isDeadlineReached) {
+                            if (users.length == 0) {
+                                users = await userList.userDetails(connection, req);
+                                users = matchDayUtils.filterActiveUsers(users);
+                            }
+                            singleMatchPredictions = await predictionUtils.getAllPredictionsPerGame(connection, match.matchNumber);
+                            let predictions = matchDayUtils.generateMatchDayPredictions(users, singleMatchPredictions, match);
+                            let matchDayDetails = matchDayUtils.generateMatchDayDetails(loginDetails, users, predictions, match);
+                            matchDayPredictions.push(matchDayDetails);
+                        } else {
+                            let message = "Deadline for " + match.homeTeam + " vs " + match.awayTeam + " is : " + match.localDate;
+                            msg.push(message);
+                        }
+                    }
+                } else if (loginDetails.role == 'admin') {
+                    for (const match of matchIds) {
+                        if (users.length == 0) {
+                            users = await userList.userDetails(connection, req);
+                        }
+                        singleMatchPredictions = await predictionUtils.getAllPredictionsPerGame(connection, match.matchNumber);
+                        let predictions = matchDayUtils.generateMatchDayPredictions(users, singleMatchPredictions, match);
+                        let matchDayDetails = matchDayUtils.generateMatchDayDetails(loginDetails, users, predictions, match);
+                        matchDayPredictions.push(matchDayDetails);
+                    }
+                }
+            }
+
+            return res.render('predictions/matchDayPredictions', {
+                title: 'Match Day Predictions',
+                team: loginDetails.team,
+                fname: loginDetails.fName,
+                matchDayPredictions: matchDayPredictions,
+                memberId: loginDetails.memberId,
+                msg: msg
+            });
+        }
+        return res.render('login/login', {
+            title: 'Scoreboard'
+        });
+    } catch (e) {
+        console.log('error processing predictions', e);
+        res.redirect('/login');
+    }
 });
 

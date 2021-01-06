@@ -79,6 +79,7 @@ app.post('/updatePredictions/:matchNumber/:memberId/:matchDay/:type', prediction
 app.post('/savePredictions/:matchNumber/:memberId/:matchDay/:type', predictions.saveSinglePredictions);
 app.post('/updateSinglePredictions/:matchNumber/:memberId/:matchDay/:type', predictions.updateSinglePredictions);
 app.get('/updatePredictions/', predictions.updatePredictions);
+app.get('/matchDayPredictions', predictions.matchDayPredictions);
 
 app.get('/users',(req, res) => {
     //res.send('Hello There');
