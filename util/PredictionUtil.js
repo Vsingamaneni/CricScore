@@ -718,13 +718,13 @@ exports.generateClientTimeZone = function generateClientTimeZone(gameWeekSchedul
     //var format = 'YYYY/MM/DD HH:mm:ss ZZ';
     let clientTimeZone = req.cookies.clientOffset;
     gameWeekSchedule.forEach(game => {
-        /*let format = 'lll';*/
-        let format = 'MMM DD YYYY, hh:mm:ss A';
+        let format = 'lll';
+        /*let format = 'MMM DD YYYY, hh:mm:ss A';*/
         let date = new Date(game.deadline);
         game.localDate = mom(date).tz(clientTimeZone).format(format);
 
         if (game.predictedTime != 'N/A'){
-            let format = 'MMM DD YYYY, hh:mm:ss A';
+            /*let format = 'MMM DD YYYY, hh:mm:ss A';*/
             let date = new Date(game.predictedTime);
             game.predictedTime = mom(date).tz(clientTimeZone).format(format);
         }
