@@ -484,7 +484,7 @@ exports.matchDayPredictions = app.get('/matchDayPredictions', async (req, res) =
                         if (match.isDeadlineReached) {
                             if (users.length == 0) {
                                 users = await userList.userDetails(connection, req);
-                                users = matchDayUtils.filterActiveUsers(users);
+                                users = userList.activeUsers(users);
                             }
                             singleMatchPredictions = await predictionUtils.getAllPredictionsPerGame(connection, match.matchNumber);
                             let predictions = matchDayUtils.generateMatchDayPredictions(users, singleMatchPredictions, match);
@@ -499,6 +499,7 @@ exports.matchDayPredictions = app.get('/matchDayPredictions', async (req, res) =
                     for (const match of matchIds) {
                         if (users.length == 0) {
                             users = await userList.userDetails(connection, req);
+                            users = userList.activeUsers(users);
                         }
                         singleMatchPredictions = await predictionUtils.getAllPredictionsPerGame(connection, match.matchNumber);
                         let predictions = matchDayUtils.generateMatchDayPredictions(users, singleMatchPredictions, match);

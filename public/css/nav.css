@@ -128,7 +128,7 @@ header{
   padding-top: 30px;
   position: fixed;
   left: 0;
-  width: 250px;
+  width: 220px;
   height: 100%;
   transition: 0.5s;
   transition-property: left;
@@ -202,7 +202,7 @@ label #sidebar_btn:hover{
 }
 
 .content{
-  margin-left: 250px;
+  margin-left: 220px;
   /*background: url(images/background.png) no-repeat;*/
   background-position: center;
   background-size: cover;

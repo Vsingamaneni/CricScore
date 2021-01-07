@@ -19,17 +19,7 @@ app.use(bodyParser.urlencoded({extended: false}));
 app.use(express.static(__dirname + '/public'));
 app.use('/public', express.static('public'));
 
-exports.filterActiveUsers = function filterActiveUsers(users) {
-    let activeUsers = [];
-    if (users.length > 0) {
-        users.forEach(user => {
-            if (user.isActive) {
-                activeUsers.push(user);
-            }
-        });
-    }
-    return activeUsers;
-}
+
 
 exports.generateMatchDayPredictions = function generateMatchDayPredictions(users, predictions, match) {
     var predictionsList = [];

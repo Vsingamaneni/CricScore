@@ -75,3 +75,15 @@ exports.deActivateUser = async function deActivateUser(connection, memberId){
         });
     });
 }
+
+exports.activeUsers = function activeUsers(users){
+    let activeUsers = [];
+    if (users.length > 0){
+        users.forEach(user =>{
+           if (user.isActive){
+               activeUsers.push(user);
+           }
+        });
+    }
+    return activeUsers;
+}
