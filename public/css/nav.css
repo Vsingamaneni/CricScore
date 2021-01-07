@@ -128,7 +128,7 @@ header{
   padding-top: 30px;
   position: fixed;
   left: 0;
-  width: 220px;
+  width: 250px;
   height: 100%;
   transition: 0.5s;
   transition-property: left;
@@ -176,7 +176,7 @@ label #sidebar_btn{
   color: #fff;
   position: fixed;
   cursor: pointer;
-  left: 300px;
+  left: 250px;
   font-size: 20px;
   margin: 5px 0;
   transition: 0.5s;
