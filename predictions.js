@@ -412,10 +412,8 @@ exports.updatePredictions = app.get('/updatePredictions/:matchNumber/:memberId/:
 
         predictions = predictionUtils.mapScheduleToPrediction(schedule, predictions, req, matchDay);
 
-        let matchDeadline;
-
         if (schedule.length > 0) {
-            matchDeadline = predictionUtils.generateClientTimeZoneSingle(schedule[0].deadline, req);
+            predictionUtils.generateClientTimeZone(predictions, req);
         }
 
         let msg;
@@ -441,7 +439,6 @@ exports.updatePredictions = app.get('/updatePredictions/:matchNumber/:memberId/:
             schedule: predictions,
             memberId: loginDetails.memberId,
             matchDay: matchDay,
-            matchDeadline: matchDeadline,
             type: type,
             msg: msg,
             alert: alert
