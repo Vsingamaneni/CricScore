@@ -49,7 +49,7 @@ exports.predictions = app.get('/predictions', async (req, res) => {
                 res.cookie('fail', null, {expires: new Date(Date.now() + 0 * 0), httpOnly: true});
             }
 
-            let schedule = await predictionUtils.sortSchedule(connection);
+            let schedule = await predictionUtils.sortSchedule(connection, req);
             let includeFinishedGames = false;
             let gameWeekSchedule = predictionUtils.predictionDetails(predictionUtils.mapSchedule(schedule, includeFinishedGames));
 
@@ -94,7 +94,7 @@ exports.viewPredictions = app.get('/viewPredictions', async (req, res) => {
                 res.cookie('msg', null, {expires: new Date(Date.now() + 0 * 0), httpOnly: true});
             }
 
-            let schedules = await predictionUtils.sortSchedule(connection);
+            let schedules = await predictionUtils.sortSchedule(connection, req);
             let matchDay = 0;
             schedules.forEach(schedule => {
                 if (schedule.isActive) {
@@ -151,9 +151,8 @@ exports.predict = app.get('/predict/:matchNumber/:memberId/:matchDay/:type', asy
                 res.cookie('alert', null, {expires: new Date(Date.now() + 0 * 0), httpOnly: true});
             }
 
-            let matchDeadline;
             if (schedule.length > 0) {
-                matchDeadline = predictionUtils.generateClientTimeZoneSingle(schedule[0].deadline, req);
+                /*matchDeadline = predictionUtils.generateClientTimeZoneSingle(schedule[0].deadline, req);*/
                 predictionUtils.setMatchAmounts(schedule);
             }
 
@@ -166,7 +165,6 @@ exports.predict = app.get('/predict/:matchNumber/:memberId/:matchDay/:type', asy
                 schedule: schedule,
                 memberId: loginDetails.memberId,
                 matchDay: matchDay,
-                matchDeadline: matchDeadline,
                 type: type,
                 msg: msg,
                 alert: alert

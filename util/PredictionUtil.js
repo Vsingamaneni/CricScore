@@ -21,7 +21,7 @@ app.use(bodyParser.urlencoded({extended: false}));
 app.use(express.static(__dirname + '/public'));
 app.use('/public', express.static('public'));
 
-exports.sortSchedule = async function getSchedule(connection) {
+exports.sortSchedule = async function getSchedule(connection, req) {
 
     let sql = `Select *
                from SCHEDULE`;
@@ -54,8 +54,9 @@ exports.sortSchedule = async function getSchedule(connection) {
         } else {
             schedule.allow = false;
         }
-        var date = new Date(schedule.deadline);
-        schedule.localDate = dateAndTime.format(date, pattern);
+/*        var date = new Date(schedule.deadline);
+        schedule.localDate = dateAndTime.format(date, pattern);*/
+        schedule.localDate = clientTimeZoneMoment(schedule.deadline, req.cookies.clientOffset);
     });
     return schedules;
 }
@@ -708,8 +709,9 @@ function returnSelectedValue(req, matchId) {
 function clientTimeZoneMoment(date, clientTimeZone) {
     //var format = 'YYYY/MM/DD HH:mm:ss ZZ';
     var format = 'lll';
-    //return mom(date).tz(clientTimeZone).format(format);
-    return mom(date).tz(clientTimeZone).format("YYYY-MM-DD HH:mm:ss");
+   /* console.log(mom(date).tz(clientTimeZone).format(format));
+    return mom(date).tz(clientTimeZone).format("YYYY-MM-DD HH:mm:ss");*/
+    return mom(date).tz(clientTimeZone).format(format);
 }
 
 exports.generateClientTimeZone = function generateClientTimeZone(gameWeekSchedule, req){
