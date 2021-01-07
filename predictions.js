@@ -195,7 +195,7 @@ exports.predictPerGame = app.get('/predictGame/:matchNumber/:memberId/:matchDay/
             }
 
             if (schedule.length > 0) {
-                matchDeadline = predictionUtils.generateClientTimeZoneSingle(schedule[0].deadline, req);
+                schedule[0].deadline = predictionUtils.generateClientTimeZoneSingle(schedule[0].deadline, req);
             }
             res.cookie('schedule', schedule, {expires: new Date(Date.now() + 100 * 60000), httpOnly: true});
             predictionUtils.setMatchAmounts(schedule);

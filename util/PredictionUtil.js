@@ -746,8 +746,8 @@ exports.generateClientTimeZoneForPredictedTimw = function generateClientTimeZone
 exports.generateClientTimeZoneSingle = function generateClientTimeZoneSingle(deadline, req){
     let clientTimeZone = req.cookies.clientOffset;
 
-        /*let format = 'lll';*/
-        let format = 'MMM DD YYYY, hh:mm:ss A';
+        let format = 'lll';
+        /*let format = 'MMM DD YYYY, hh:mm:ss A';*/
         let date = new Date(deadline);
         return mom(date).tz(clientTimeZone).format(format);
 

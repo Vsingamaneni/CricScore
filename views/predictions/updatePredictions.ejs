@@ -52,7 +52,7 @@
 
         <% schedule.forEach(function(match){ %>
             <div class="container">
-                <h1 style="text-align: center; color: #19B3D3;">Deadline : <i><%= match.deadline %> </i></h1>
+                <h1 style="text-align: center; color: #19B3D3;">Deadline : <i><%= matchDeadline %> </i></h1>
                 <form autocomplete="off" action="/updateSinglePredictions/<%= match.matchNumber %>/<%= memberId %>/<%= match.matchDay %>/<%= type %>" method="POST">
 
                     <table class="table table-dark table-striped">
