@@ -92,7 +92,7 @@ exports.getMatchdaySchedule = async function getMatchdaySchedule(connection, mat
 }
 
 // returns the entire schedule for the given matchDay.
-exports.getMatchSchedule = async function getMatchSchedule(connection, matchNumber) {
+exports.getMatchSchedule = async function getMatchSchedule(connection, matchNumber, req) {
 
     let sql = `Select * from SCHEDULE where matchNumber =${matchNumber}`;
     var matches = [];
@@ -105,6 +105,7 @@ exports.getMatchSchedule = async function getMatchSchedule(connection, matchNumb
                 if (results.length > 0) {
                     results.forEach(function (item) {
                         if (!item.done) {
+                            item.deadline = clientTimeZoneMoment(item.deadline, req.cookies.clientOffset);
                             matches.push(item);
                         }
                     });

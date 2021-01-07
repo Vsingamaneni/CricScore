@@ -185,7 +185,7 @@ exports.predictPerGame = app.get('/predictGame/:matchNumber/:memberId/:matchDay/
             let loginDetails = JSON.parse(req.cookies.loginDetails);
             const matchNumber = req.params.matchNumber;
             const type = req.params.type;
-            let schedule = await predictionUtils.getMatchSchedule(connection, matchNumber);
+            let schedule = await predictionUtils.getMatchSchedule(connection, matchNumber, req);
             let matchDeadline;
 
             let alert;
@@ -194,9 +194,9 @@ exports.predictPerGame = app.get('/predictGame/:matchNumber/:memberId/:matchDay/
                 res.cookie('alert', null, {expires: new Date(Date.now() + 0 * 0), httpOnly: true});
             }
 
-            if (schedule.length > 0) {
+/*            if (schedule.length > 0) {
                 schedule[0].deadline = predictionUtils.generateClientTimeZoneSingle(schedule[0].deadline, req);
-            }
+            }*/
             res.cookie('schedule', schedule, {expires: new Date(Date.now() + 100 * 60000), httpOnly: true});
             predictionUtils.setMatchAmounts(schedule);
 
@@ -406,15 +406,15 @@ exports.updatePredictions = app.get('/updatePredictions/:matchNumber/:memberId/:
             predictions = await predictionUtils.userPredictions(connection, loginDetails.memberId, matchDay);
 
         } else {
-            schedule = await predictionUtils.getMatchSchedule(connection, matchId);
+            schedule = await predictionUtils.getMatchSchedule(connection, matchId, req);
             predictions = await predictionUtils.retrievePrediction(connection, loginDetails.memberId, matchId);
         }
 
         predictions = predictionUtils.mapScheduleToPrediction(schedule, predictions, req, matchDay);
 
-        if (schedule.length > 0) {
+/*        if (schedule.length > 0) {
             predictionUtils.generateClientTimeZone(predictions, req);
-        }
+        }*/
 
         let msg;
         if (undefined != req.cookies.msg) {
