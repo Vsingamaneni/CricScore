@@ -2,7 +2,6 @@ const path = require('path');
 const express = require('express');
 const bodyParser = require('body-parser');
 var mom = require('moment-timezone');
-var dateFormat = require('dateformat');
 const sortMap = require('sort-map')
 
 mom.suppressDeprecationWarnings = true;
@@ -66,7 +65,7 @@ exports.generateMatchDayPredictions = function generateMatchDayPredictions(users
     return predictionsList;
 }
 
-exports.generateMatchDayDetails = function generateMatchDayDetails(loginDetails, users, predictions, schedule) {
+exports.generateMatchDayDetails = function generateMatchDayDetails(loginDetails, users, predictions, schedule, req) {
     let matchDayDetails = {'schedule': schedule};
     let home = schedule.homeTeam;
     let away = schedule.awayTeam;
@@ -75,6 +74,8 @@ exports.generateMatchDayDetails = function generateMatchDayDetails(loginDetails,
     let currentUserPrediction = null;
     let homeTotal = 0;
     let awayTotal = 0;
+
+    schedule.deadline = clientTimeZoneMoment(schedule.deadline, req.cookies.clientOffset);
 
     let userDetails = {'total': users.length};
     let defaultCount = 0;
@@ -128,15 +129,15 @@ exports.generateMatchDayDetails = function generateMatchDayDetails(loginDetails,
     userDetails.defaultCount = defaultCount;
     matchDayDetails.userDetails = userDetails;
 
-    if (currentUserPrediction.selected == schedule.homeTeam) {
-        userSelected = 'home';
-    } else if (currentUserPrediction.selected == schedule.awayTeam) {
-        userSelected = 'away';
-    } else if (currentUserPrediction.selected == 'Default'){
-        userSelected = 'default';
-    }
 
     if (schedule.isDeadlineReached) {
+        if (currentUserPrediction.selected == schedule.homeTeam) {
+            userSelected = 'home';
+        } else if (currentUserPrediction.selected == schedule.awayTeam) {
+            userSelected = 'away';
+        } else if (currentUserPrediction.selected == 'Default'){
+            userSelected = 'default';
+        }
 
         let isHomeSelection = userSelected == 'home' ? true : false;
         let adminFees = 0;
@@ -177,4 +178,9 @@ exports.generateMatchDayDetails = function generateMatchDayDetails(loginDetails,
     matchDayDetails.currentUserPrediction = currentUserPrediction;
 
     return matchDayDetails;
+}
+
+function clientTimeZoneMoment(date, clientTimeZone) {
+    var format = 'lll';
+     return mom(date).tz(clientTimeZone).format(format);
 }

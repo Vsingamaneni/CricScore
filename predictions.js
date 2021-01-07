@@ -491,7 +491,7 @@ exports.matchDayPredictions = app.get('/matchDayPredictions', async (req, res) =
                             }
                             singleMatchPredictions = await predictionUtils.getAllPredictionsPerGame(connection, match.matchNumber);
                             let predictions = matchDayUtils.generateMatchDayPredictions(users, singleMatchPredictions, match);
-                            let matchDayDetails = matchDayUtils.generateMatchDayDetails(loginDetails, users, predictions, match);
+                            let matchDayDetails = matchDayUtils.generateMatchDayDetails(loginDetails, users, predictions, match, req);
                             matchDayPredictions.push(matchDayDetails);
                         } else {
                             let message = "Deadline for " + match.homeTeam + " vs " + match.awayTeam + " is : " + match.localDate;
@@ -505,7 +505,7 @@ exports.matchDayPredictions = app.get('/matchDayPredictions', async (req, res) =
                         }
                         singleMatchPredictions = await predictionUtils.getAllPredictionsPerGame(connection, match.matchNumber);
                         let predictions = matchDayUtils.generateMatchDayPredictions(users, singleMatchPredictions, match);
-                        let matchDayDetails = matchDayUtils.generateMatchDayDetails(loginDetails, users, predictions, match);
+                        let matchDayDetails = matchDayUtils.generateMatchDayDetails(loginDetails, users, predictions, match, req);
                         matchDayPredictions.push(matchDayDetails);
                     }
                 }
