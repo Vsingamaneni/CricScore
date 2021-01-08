@@ -35,8 +35,7 @@
                 <thead>
                 <tr style="background-color: #5b5d5d;font-size: 18px;">
                     <th><i>#</i></th>
-                    <th><i>First Name</i></th>
-                    <th><i>Last Name</i></th>
+                    <th><i>Name</i></th>
                     <th><i>Favourite</i></th>
                     <th><i>Location</i></th>
                     <th><i>Status</i></th>
@@ -52,36 +51,29 @@
                             <tr style="font-size: 18px;">
                         <% } %>
                             <td><%= user.memberId %></td>
-                            <td><%= user.fname %></td>
-                            <td><%= user.lname %></td>
+                            <td><%= user.fname %> <%= user.lname %></td>
                             <td><%= user.selectedTeam %></td>
                             <td><%= user.country %></td>
                             <% if (loginDetails.role == 'member' ){%>
                                 <% if (user.isActive){%>
-<!--                                    <td> <a href="#" class="users_btn">Active</a> </td>-->
-                                    <td> <a href="#" class="users_active_btn">Active</a> </td>
+                                    <!--<td> <a href="#" class="users_btn">Active</a> </td>-->
+                                    <td> <a href="#" class="users_active_btn" style="color:greenyellow;">Active</a> </td>
                                 <% }%>
                                 <% if (!user.isActive){%>
                                     <!--<td> <a href="#" class="users_inactive_btn">In Active</a> </td>-->
-                                    <td> <a href="/activate/<%= user.memberId %>" class="users_inactive_btn" >In Active</a> </td>
+                                    <td> <a href="#" class="users_inactive_btn" style="color:#e36666;">In Active</a> </td>
                                 <% }%>
                             <% }%>
                             <% if (loginDetails.role == 'admin' ){%>
-                                <% if (user.isAdminActivated){%>
                                     <% if (user.isActive){%>
                                         <!--<td> <a href="#" class="users_btn">Active</a> </td>-->
                                         <!--<td> <a href="#" class="users_active_btn">Active</a> </td>-->
-                                        <td> <a href="/deActivate/<%= user.memberId %>" class="users_active_btn">Deactivate</a> </td>
+                                        <td> <a href="/deActivate/<%= user.memberId %>" class="users_active_btn">De Activate</a> </td>
                                     <% }%>
                                     <% if (!user.isActive){%>
                                          <!--<td> <a href="/activate/<%= user.memberId %>" class="users_inactive_btn">Active User</a> </td>-->
-                                         <td> <a href="/activate/<%= user.memberId %>" class="users_activate_btn">Activate User</a> </td>
+                                         <td> <a href="/activate/<%= user.memberId %>" class="users_activate_btn">Activate</a> </td>
                                     <% }%>
-                                <% }%>
-                                <% if (!user.isAdminActivated){%>
-                                        <!--<td> <a href="/activate/<%= user.memberId %>" class="users_inactive_btn">Active User</a> </td>-->
-                                        <td> <a href="/activate/<%= user.memberId %>" class="users_activate_btn">Activate User</a> </td>
-                                <% }%>
                             <% }%>
                         </tr>
                     <% }); %>

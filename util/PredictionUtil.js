@@ -5,6 +5,7 @@ var mom = require('moment-timezone');
 var dateFormat = require('dateformat');
 const dateAndTime = require('date-and-time');
 const pattern = dateAndTime.compile('MMM DD YYYY, hh:mm:ss A');
+let userList = require('./users');
 
 mom.suppressDeprecationWarnings = true;
 
@@ -774,6 +775,17 @@ exports.setMatchAmounts = function setMatchAmounts(schedule) {
 
         })
     }
+}
+
+exports.validateUser = async function validateUser(connection, loginDetails){
+    let users = await userList.isActiveUser(connection, loginDetails);
+    let isActive = false;
+    if (users.length > 0){
+        if (users[0].isActive){
+            isActive = true;
+        }
+    }
+    return isActive;
 }
 
 

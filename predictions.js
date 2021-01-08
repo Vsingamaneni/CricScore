@@ -31,9 +31,11 @@ exports.predictions = app.get('/predictions', async (req, res) => {
         if (req.cookies.loginDetails) {
             let type = 'all';
             let loginDetails = JSON.parse(req.cookies.loginDetails);
+
             let alert;
             let msg;
             let fail;
+
             if (undefined != req.cookies.alert) {
                 alert = req.cookies.alert;
                 res.cookie('alert', null, {expires: new Date(Date.now() + 0 * 0), httpOnly: true});
@@ -94,6 +96,13 @@ exports.viewPredictions = app.get('/viewPredictions', async (req, res) => {
                 res.cookie('msg', null, {expires: new Date(Date.now() + 0 * 0), httpOnly: true});
             }
 
+            let alert;
+            if (undefined != req.cookies.alert) {
+                alert = req.cookies.alert;
+                res.cookie('alert', null, {expires: new Date(Date.now() + 0 * 0), httpOnly: true});
+            }
+
+
             let schedules = await predictionUtils.sortSchedule(connection, req);
             let matchDay = 0;
             schedules.forEach(schedule => {
@@ -117,7 +126,8 @@ exports.viewPredictions = app.get('/viewPredictions', async (req, res) => {
                 memberId: loginDetails.memberId,
                 viewPredictions: predictions,
                 type: type,
-                msg: msg
+                msg: msg,
+                alert: alert
             });
 
         } else {
@@ -134,10 +144,24 @@ exports.predict = app.get('/predict/:matchNumber/:memberId/:matchDay/:type', asy
         if (req.cookies.loginDetails) {
             const type = req.params.type;
             let loginDetails = JSON.parse(req.cookies.loginDetails);
+
+            let isActive = await predictionUtils.validateUser(connection, loginDetails);
+            if (!isActive) {
+                let alert = [];
+                let msg = "You must be active to predict for matches";
+                alert.push(msg);
+                res.cookie('alert', alert, {expires: new Date(Date.now() + 100 * 60000), httpOnly: true});
+                if (type == 'all') {
+                    return res.redirect('/predictions');
+                } else {
+                    return res.redirect('/viewPredictions');
+                }
+            }
+
             const matchDay = req.params.matchDay;
             let schedule = await predictionUtils.getMatchdaySchedule(connection, matchDay, req);
             let userPredictions = await predictionUtils.getMatchdayPredictions(connection, loginDetails.memberId, matchDay);
-            schedule = predictionUtils.mapSelectedPredictions(userPredictions, schedule)
+            schedule = predictionUtils.mapSelectedPredictions(userPredictions, schedule);
 
             let msg;
             if (undefined != req.cookies.msg) {
@@ -152,7 +176,6 @@ exports.predict = app.get('/predict/:matchNumber/:memberId/:matchDay/:type', asy
             }
 
             if (schedule.length > 0) {
-                /*matchDeadline = predictionUtils.generateClientTimeZoneSingle(schedule[0].deadline, req);*/
                 predictionUtils.setMatchAmounts(schedule);
             }
 
@@ -194,9 +217,19 @@ exports.predictPerGame = app.get('/predictGame/:matchNumber/:memberId/:matchDay/
                 res.cookie('alert', null, {expires: new Date(Date.now() + 0 * 0), httpOnly: true});
             }
 
-/*            if (schedule.length > 0) {
-                schedule[0].deadline = predictionUtils.generateClientTimeZoneSingle(schedule[0].deadline, req);
-            }*/
+            let isActive = await predictionUtils.validateUser(connection, loginDetails);
+            if (!isActive) {
+                let alert = [];
+                let msg = "You must be active to predict for matches";
+                alert.push(msg);
+                res.cookie('alert', alert, {expires: new Date(Date.now() + 100 * 60000), httpOnly: true});
+                if (type == 'all') {
+                    return res.redirect('/predictions');
+                } else {
+                    return res.redirect('/viewPredictions');
+                }
+            }
+
             res.cookie('schedule', schedule, {expires: new Date(Date.now() + 100 * 60000), httpOnly: true});
             predictionUtils.setMatchAmounts(schedule);
 
@@ -340,7 +373,7 @@ exports.updateSinglePredictions = app.post('/updateSinglePredictions/:matchNumbe
             return true;
         })
 
-], (req, res) => {
+], async (req, res) => {
     try {
         const errors = validationResult(req)
         if (!errors.isEmpty()) {
@@ -360,6 +393,19 @@ exports.updateSinglePredictions = app.post('/updateSinglePredictions/:matchNumbe
         } else {
             const matchNumber = req.params.matchNumber;
             try {
+                let loginDetails = JSON.parse(req.cookies.loginDetails);
+                let isActive = await predictionUtils.validateUser(connection, loginDetails);
+                if (!isActive) {
+                    let alert = [];
+                    let msg = "You must be active to predict for matches";
+                    alert.push(msg);
+                    res.cookie('alert', alert, {expires: new Date(Date.now() + 100 * 60000), httpOnly: true});
+                    if (type == 'all') {
+                        return res.redirect('/predictions');
+                    } else {
+                        return res.redirect('/viewPredictions');
+                    }
+                }
                 if (predictionUtils.updateSinglePrediction(connection, req, matchNumber, res)) {
                     const updateMessage = [];
                     updateMessage.push('Predictions updated successfully for Game # : ' + matchNumber);
@@ -412,10 +458,6 @@ exports.updatePredictions = app.get('/updatePredictions/:matchNumber/:memberId/:
 
         predictions = predictionUtils.mapScheduleToPrediction(schedule, predictions, req, matchDay);
 
-/*        if (schedule.length > 0) {
-            predictionUtils.generateClientTimeZone(predictions, req);
-        }*/
-
         let msg;
         if (undefined != req.cookies.msg) {
             msg = req.cookies.msg;
@@ -426,6 +468,19 @@ exports.updatePredictions = app.get('/updatePredictions/:matchNumber/:memberId/:
         if (undefined != req.cookies.alert) {
             alert = req.cookies.alert;
             res.cookie('alert', null, {expires: new Date(Date.now() + 0 * 0), httpOnly: true});
+        }
+
+        let isActive = await predictionUtils.validateUser(connection, loginDetails);
+        if (!isActive) {
+            let alert = [];
+            let msg = "You must be active to predict for matches";
+            alert.push(msg);
+            res.cookie('alert', alert, {expires: new Date(Date.now() + 100 * 60000), httpOnly: true});
+            if (type == 'all') {
+                return res.redirect('/predictions');
+            } else {
+                return res.redirect('/viewPredictions');
+            }
         }
 
         predictionUtils.setMatchAmounts(predictions);
@@ -479,24 +534,8 @@ exports.matchDayPredictions = app.get('/matchDayPredictions', async (req, res) =
                 let message = "No active matches";
                 msg.push(message);
             } else {
-                if (loginDetails.role == 'member') {
-                    for (const match of matchIds) {
-                        if (match.isDeadlineReached) {
-                            if (users.length == 0) {
-                                users = await userList.userDetails(connection, req);
-                                users = userList.activeUsers(users);
-                            }
-                            singleMatchPredictions = await predictionUtils.getAllPredictionsPerGame(connection, match.matchNumber);
-                            let predictions = matchDayUtils.generateMatchDayPredictions(users, singleMatchPredictions, match);
-                            let matchDayDetails = matchDayUtils.generateMatchDayDetails(loginDetails, users, predictions, match, req);
-                            matchDayPredictions.push(matchDayDetails);
-                        } else {
-                            let message = "Deadline for " + match.homeTeam + " vs " + match.awayTeam + " is : " + match.localDate;
-                            msg.push(message);
-                        }
-                    }
-                } else if (loginDetails.role == 'admin') {
-                    for (const match of matchIds) {
+                for (const match of matchIds) {
+                    if (match.isDeadlineReached || loginDetails.role == 'admin') {
                         if (users.length == 0) {
                             users = await userList.userDetails(connection, req);
                             users = userList.activeUsers(users);
@@ -505,6 +544,9 @@ exports.matchDayPredictions = app.get('/matchDayPredictions', async (req, res) =
                         let predictions = matchDayUtils.generateMatchDayPredictions(users, singleMatchPredictions, match);
                         let matchDayDetails = matchDayUtils.generateMatchDayDetails(loginDetails, users, predictions, match, req);
                         matchDayPredictions.push(matchDayDetails);
+                    } else {
+                        let message = "Deadline for " + match.homeTeam + " vs " + match.awayTeam + " is : " + match.localDate;
+                        msg.push(message);
                     }
                 }
             }

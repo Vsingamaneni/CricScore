@@ -83,7 +83,7 @@ header{
   text-decoration: none;
   font-size: 18px;
   font-weight: 600;
-  color: #9bf802;
+  color: #d98790;
   transition: 0.5s;
   transition-property: background;
 }
@@ -92,16 +92,17 @@ header{
   text-decoration: none;
   font-size: 15px;
   font-weight: 600;
-  color: #d32819;
+  color: #f14638;
   transition: 0.5s;
   transition-property: background;
 }
+
 
 .users_activate_btn{
   text-decoration: none;
   font-size: 18px;
   font-weight: 600;
-  color: #d8b0db;
+  color: #cbf3bd;
   transition: 0.5s;
   transition-property: background;
 }

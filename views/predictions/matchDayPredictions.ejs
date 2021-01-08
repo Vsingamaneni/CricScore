@@ -12,7 +12,6 @@
     <%- include('../body.ejs') %>
     <div class="content" style="background-color:#f6f7fa">
         <br><br><br><br>
-        <br><br><br><br>
 
         <div class="container">
             <% if(typeof alert != 'undefined') { %>
@@ -48,16 +47,32 @@
             <% matchDayPredictions.forEach(function(matchDay){ %>
                 <h1 style="text-align: center; color: #19B3D3;">Match : <i><%= matchDay.schedule.homeTeam %> vs <%= matchDay.schedule.awayTeam %> </i></h1>
                 <h1 style="text-align: center; color: #19B3D3;">Deadline : <i><%= matchDay.schedule.deadline %> </i></h1>
-                <table class="table table-dark table-striped" style="width: 30%;font-size:20px;font-family: Arial, Helvetica, sans-serif;">
+                <table class="table table-dark table-striped" style="width: 30%;font-size:20px;font-family: Arial, Helvetica, sans-serif;width:40%;">
                         <tr style="text-align:center;background-color: #5b5d5d;font-size: 18px;">
                             <td><i>USERS</i></td>
                             <td><i>PREDICTED</i></td>
                             <td><i>DEFAULT</i></td>
+                            <% if(matchDay.defaulters.length >0){%>
+                            <td><i>DEFAULTERS</i></td>
+                            <%}%>
                         </tr>
                         <tr>
                             <td style="padding: 5px;font-size:20px;border: 1px solid black;"><%= matchDay.userDetails.total %></td>
                             <td style="padding: 5px;font-size:20px;border: 1px solid black;"><%= matchDay.userDetails.predicted %></td>
                             <td style="padding: 5px;font-size:20px;border: 1px solid black;"><%= matchDay.userDetails.defaultCount %></td>
+                            <% if(matchDay.defaulters.length >0){%>
+                            <td style="padding: 5px;font-size:20px;border: 1px solid black;">
+                                <details>
+                                    <summary>View</summary>
+                                    <ui style="list-style-type: square; text-align: left;">
+                                        <br>
+                                        <% matchDay.defaulters.forEach(function(member){ %>
+                                            <li style="font-size: 18px;"><%= member %></li>
+                                        <% }); %>
+                                    </ui>
+                                </details>
+                            </td>
+                            <%}%>
                         </tr>
                     </table>
                     <% if (null != matchDay.currentUserPrediction) {%>
@@ -80,21 +95,21 @@
                         </tr>
                     </table>
                         <%}%>
-                <table class="table table-dark table-striped">
+                <table class="table table-dark table-striped" >
                     <tr>
                         <td style="padding: 5px;font-size:20px;border: 1px solid black;">
-                            <p style="text-align:center;"><%= matchDay.schedule.homeTeam %></p>
-                            <table style="margin:0 auto;border: 1px solid black;">
+                            <p style="text-align:center;"><%= matchDay.schedule.homeTeam %> - <%= matchDay.schedule.homeCount %></p>
+                            <table style="margin:0 auto;border: 1px solid black;width:85%;">
                                 <tr style="text-align:center;background-color: #5b5d5d;font-size: 18px;">
-                                    <td style="padding: 5px;font-size:20px;border: 1px solid black;">Amount</td>
                                     <td style="padding: 5px;font-size:20px;border: 1px solid black;">Count</td>
+                                    <td style="padding: 5px;font-size:20px;border: 1px solid black;">Amount</td>
                                     <td style="padding: 5px;font-size:20px;border: 1px solid black;">Expected</td>
                                     <td style="padding: 5px;font-size:20px;border: 1px solid black;">Members</td>
                                 </tr>
                                 <% for (const [key, value] of matchDay.homeTeam.entries()) { %>
                                         <tr style="text-align:center;">
-                                            <td style="padding: 5px;font-size:20px;border: 1px solid black;"><%= key %></td>
                                             <td style="padding: 5px;font-size:20px;border: 1px solid black;"><%= value.count %></td>
+                                            <td style="padding: 5px;font-size:20px;border: 1px solid black;"><%= key %></td>
                                             <td style="padding: 5px;font-size:20px;border: 1px solid black;"><%= value.winning %></td>
                                             <td style="padding: 5px;font-size:20px;border: 1px solid black;">
                                                 <details>
@@ -112,18 +127,18 @@
                             </table>
                         </td>
                         <td style="padding: 5px;font-size:20px;border: 1px solid black;">
-                            <p style="text-align:center;"><%= matchDay.schedule.awayTeam %></p>
-                            <table style="margin:0 auto;border: 1px solid black;">
-                                <tr style="text-align:center;background-color: #5b5d5d;font-size: 18px;">
-                                    <td style="padding: 5px;font-size:20px;border: 1px solid black;">Amount</td>
+                            <p style="text-align:center;"><%= matchDay.schedule.awayTeam %> - <%= matchDay.schedule.awayCount %></p>
+                            <table style="margin:0 auto;border: 1px solid black;width:85%;">
+                                <tr style="text-align:center;background-color: #5b5d5d;font-size: 18px;width:90%;">
                                     <td style="padding: 5px;font-size:20px;border: 1px solid black;">Count</td>
+                                    <td style="padding: 5px;font-size:20px;border: 1px solid black;">Amount</td>
                                     <td style="padding: 5px;font-size:20px;border: 1px solid black;">Expected</td>
                                     <td style="padding: 5px;font-size:20px;border: 1px solid black;">Members</td>
                                 </tr>
                                 <% for (const [key, value] of matchDay.awayTeam.entries()) { %>
                                     <tr style="text-align:center;">
-                                        <td style="padding: 5px;font-size:20px;border: 1px solid black;"><%= key %></td>
                                         <td style="padding: 5px;font-size:20px;border: 1px solid black;"><%= value.count %></td>
+                                        <td style="padding: 5px;font-size:20px;border: 1px solid black;"><%= key %></td>
                                         <td style="padding: 5px;font-size:20px;border: 1px solid black;"><%= value.winning %></td>
                                         <td style="padding: 5px;font-size:20px;border: 1px solid black;">
                                             <details>

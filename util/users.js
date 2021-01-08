@@ -25,6 +25,8 @@ exports.userDetails = async function getUserDetails(connection, req){
                 let users = [];
                 if (results.length > 0){
                     results.forEach(function(item) {
+                        item.fname = item.fname.toUpperCase();
+                        item.lname = item.lname.toUpperCase();
                         let loginDetails = JSON.parse(req.cookies.loginDetails);
                         if (loginDetails.memberId == item.memberId){
                             item.current = true;
@@ -86,4 +88,27 @@ exports.activeUsers = function activeUsers(users){
         });
     }
     return activeUsers;
+}
+
+exports.isActiveUser = async function isActiveUser(connection, loginDetails){
+    let users = [];
+    if (null != loginDetails){
+        let sql = `Select * from REGISTER where memberId=${loginDetails.memberId}`;
+        return await new Promise( (resolve,reject) => {
+            connection.query(sql, function(err, results) {
+                if(err){
+                    reject(err);
+                } else {
+                    if (results.length > 0){
+                        results.forEach(function(item) {
+                            users.push(item);
+                        });
+                        resolve(users);
+                    } else {
+                        resolve(users);
+                    }
+                }
+            });
+        });
+    }
 }

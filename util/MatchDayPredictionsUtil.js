@@ -65,6 +65,10 @@ exports.generateMatchDayDetails = function generateMatchDayDetails(loginDetails,
     let homeTotal = 0;
     let awayTotal = 0;
 
+    let homeCount = 0;
+    let awayCount = 0;
+    let defaulters = [];
+
     schedule.deadline = clientTimeZoneMoment(schedule.deadline, req.cookies.clientOffset);
 
     let userDetails = {'total': users.length};
@@ -81,6 +85,7 @@ exports.generateMatchDayDetails = function generateMatchDayDetails(loginDetails,
             }
 
             if (prediction.selected == home) {
+                homeCount = homeCount +1;
                 predicted = predicted + 1;
                 homeTotal = homeTotal + prediction.amount;
                 if (homeTeam.get(amountKey)) {
@@ -96,6 +101,7 @@ exports.generateMatchDayDetails = function generateMatchDayDetails(loginDetails,
                 }
 
             } else if (prediction.selected == away) {
+                awayCount = awayCount +1;
                 predicted = predicted + 1;
                 awayTotal = awayTotal + prediction.amount;
                 if (awayTeam.get(amountKey)) {
@@ -112,12 +118,14 @@ exports.generateMatchDayDetails = function generateMatchDayDetails(loginDetails,
 
             } else if (prediction.selected == 'Default') {
                 defaultCount = defaultCount + 1;
+                defaulters.push(prediction.firstName);
             }
         });
     }
     userDetails.predicted = predicted;
     userDetails.defaultCount = defaultCount;
     matchDayDetails.userDetails = userDetails;
+    matchDayDetails.defaulters = defaulters;
 
 
     if (schedule.isDeadlineReached) {
@@ -162,6 +170,9 @@ exports.generateMatchDayDetails = function generateMatchDayDetails(loginDetails,
             currentUserPrediction.winning = 'N/A';
         }
     }
+
+    schedule.homeCount = homeCount;
+    schedule.awayCount = awayCount;
 
     matchDayDetails.homeTeam = sortMap(homeTeam);
     matchDayDetails.awayTeam = sortMap(awayTeam);

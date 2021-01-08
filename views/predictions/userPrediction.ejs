@@ -24,6 +24,16 @@
                 <br><br><br>
             <% }) %>
         <% } %>
+        <% if(typeof alert != 'undefined') { %>
+            <br/>
+            <% alert.forEach(function(error) { %>
+                <div style="color:red;text-align: center;font-size: 25px; font-weight: 900; font-family: Roboto, sans-serif;"
+                     role="alert">
+                    <i><%= error %></i>
+                </div>
+                <br><br><br>
+            <% }) %>
+        <% } %>
 
         <div class="container">
             <table class="table table-dark table-striped" style="width:90%;">
