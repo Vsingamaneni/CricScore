@@ -20,7 +20,7 @@ app.use('/public', express.static('public'));
 
 
 exports.matchDetails = async function getMatchDetails(connection, req){
-    let sql = `Select * from SCHEDULE order by matchNumber asc`;
+    let sql = `Select * from SCHEDULE where isActive= true`;
     return await new Promise( (resolve,reject) => {
         let result = connection.query(sql, function(err, results) {
 
@@ -32,6 +32,7 @@ exports.matchDetails = async function getMatchDetails(connection, req){
                     results.forEach(function(item) {
                         // item.clientTime = clientTimeZone(item.deadline, req.cookies.clientOffset);
                         item.momentClientTime = clientTimeZoneMoment(item.deadline, req.cookies.clientOffset);
+                        item.deadline = dashboardFormat(item.deadline, req.cookies.clientOffset);
                         schedule.push(item);
                     });
                     resolve(schedule);
@@ -61,5 +62,11 @@ function clientTimeZone(date, clientTimeZone){
 function clientTimeZoneMoment(date, clientTimeZone){
     //var format = 'YYYY/MM/DD HH:mm:ss ZZ';
     var format = 'lll';
+    return mom(date).tz(clientTimeZone).format(format);
+}
+
+function dashboardFormat(date, clientTimeZone){
+    //var format = 'YYYY/MM/DD HH:mm:ss ZZ';
+    var format = "yyyy-MM-DDTHH:mm:ss";
     return mom(date).tz(clientTimeZone).format(format);
 }

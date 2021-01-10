@@ -796,7 +796,6 @@ exports.generateClientTimeZoneSingle = function generateClientTimeZoneSingle(dea
 
 }
 
-
 exports.setMatchAmounts = function setMatchAmounts(schedule) {
     if (schedule.length > 0) {
         schedule.forEach(match => {
