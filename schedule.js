@@ -31,6 +31,8 @@ exports.dashboard = app.get('/dashboard', async (req, res) => {
             let loginDetails = JSON.parse(req.cookies.loginDetails);
             let schedule = await utils.matchDetails(connection, req);
 
+            schedule = utils.getActiveSchedule(schedule);
+
             return res.render('schedule/dashboard', {
                 title: 'Dashboard',
                 loginDetails: loginDetails,

@@ -20,7 +20,7 @@ app.use('/public', express.static('public'));
 
 
 exports.matchDetails = async function getMatchDetails(connection, req){
-    let sql = `Select * from SCHEDULE where isActive= true`;
+    let sql = `Select * from SCHEDULE order by matchNumber asc`;
     return await new Promise( (resolve,reject) => {
         let result = connection.query(sql, function(err, results) {
 
@@ -49,16 +49,6 @@ exports.generateMatchDay = function generateMatchDay(schedule){
 
 }
 
-function clientTimeZone(date, clientTimeZone){
-    let dateLocal = new Date(date);
-    let usaTime =
-        dateLocal.toLocaleString("en-US", {
-            timeZone: clientTimeZone
-        });
-
-    return usaTime;
-}
-
 function clientTimeZoneMoment(date, clientTimeZone){
     //var format = 'YYYY/MM/DD HH:mm:ss ZZ';
     var format = 'lll';
@@ -69,4 +59,16 @@ function dashboardFormat(date, clientTimeZone){
     //var format = 'YYYY/MM/DD HH:mm:ss ZZ';
     var format = "yyyy-MM-DDTHH:mm:ss";
     return mom(date).tz(clientTimeZone).format(format);
+}
+
+exports.getActiveSchedule = function getActiveSchedule(schedule){
+    let activeSchedule = [];
+    if (schedule.length > 0){
+        schedule.forEach(game =>{
+            if (game.isActive){
+                activeSchedule.push(game);
+            }
+        });
+    }
+    return activeSchedule;
 }
