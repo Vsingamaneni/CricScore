@@ -55,8 +55,8 @@ exports.sortSchedule = async function getSchedule(connection, req) {
         } else {
             schedule.allow = false;
         }
-/*        var date = new Date(schedule.deadline);
-        schedule.localDate = dateAndTime.format(date, pattern);*/
+        /*        var date = new Date(schedule.deadline);
+                schedule.localDate = dateAndTime.format(date, pattern);*/
         schedule.localDate = clientTimeZoneMoment(schedule.deadline, req.cookies.clientOffset);
     });
     return schedules;
@@ -107,6 +107,34 @@ exports.getMatchSchedule = async function getMatchSchedule(connection, matchNumb
                     results.forEach(function (item) {
                         if (!item.done) {
                             item.deadline = clientTimeZoneMoment(item.deadline, req.cookies.clientOffset);
+                            matches.push(item);
+                        }
+                    });
+                    resolve(matches);
+                } else {
+                    resolve(matches);
+                }
+            }
+        });
+    });
+
+    return matches;
+}
+
+// returns the entire schedule for the given matchDay in local time.
+async function getMatchScheduleLocalTime(connection, matchNumber) {
+
+    let sql = `Select * from SCHEDULE where matchNumber =${matchNumber}`;
+    var matches = [];
+
+    await new Promise((resolve, reject) => {
+        connection.query(sql, function (err, results) {
+            if (err) {
+                reject(err);
+            } else {
+                if (results.length > 0) {
+                    results.forEach(function (item) {
+                        if (!item.done) {
                             matches.push(item);
                         }
                     });
@@ -237,11 +265,21 @@ function validateDeadline(gameWeekSchedule) {
     }
 }
 
+exports.isDeadlineReachedForPrediction = async function isDeadlineReachedForPrediction(connection, matchNumber) {
+    let schedule = await getMatchScheduleLocalTime(connection, matchNumber);
+
+    if (schedule.length > 0) {
+        return isDeadlineReached(schedule[0].deadline);
+    } else {
+        return false;
+    }
+}
+
 exports.validatePredictionDeadline = function validatePredictionDeadline(predictions) {
     if (predictions.length > 0) {
         predictions.forEach(game => {
             game.isDeadlineReached = isDeadlineReached(game.deadline);
-            if (game.isDeadlineReached && game.selected == '-'){
+            if (game.isDeadlineReached && game.selected == '-') {
                 game.selected = 'Default';
                 game.amount = -game.matchAmount;
             }
@@ -714,12 +752,12 @@ function returnSelectedValue(req, matchId) {
 function clientTimeZoneMoment(date, clientTimeZone) {
     //var format = 'YYYY/MM/DD HH:mm:ss ZZ';
     var format = 'lll';
-   /* console.log(mom(date).tz(clientTimeZone).format(format));
-    return mom(date).tz(clientTimeZone).format("YYYY-MM-DD HH:mm:ss");*/
+    /* console.log(mom(date).tz(clientTimeZone).format(format));
+     return mom(date).tz(clientTimeZone).format("YYYY-MM-DD HH:mm:ss");*/
     return mom(date).tz(clientTimeZone).format(format);
 }
 
-exports.generateClientTimeZone = function generateClientTimeZone(gameWeekSchedule, req){
+exports.generateClientTimeZone = function generateClientTimeZone(gameWeekSchedule, req) {
     //var format = 'YYYY/MM/DD HH:mm:ss ZZ';
     let clientTimeZone = req.cookies.clientOffset;
     gameWeekSchedule.forEach(game => {
@@ -728,7 +766,7 @@ exports.generateClientTimeZone = function generateClientTimeZone(gameWeekSchedul
         let date = new Date(game.deadline);
         game.localDate = mom(date).tz(clientTimeZone).format(format);
 
-        if (game.predictedTime != 'N/A'){
+        if (game.predictedTime != 'N/A') {
             /*let format = 'MMM DD YYYY, hh:mm:ss A';*/
             let date = new Date(game.predictedTime);
             game.predictedTime = mom(date).tz(clientTimeZone).format(format);
@@ -736,11 +774,11 @@ exports.generateClientTimeZone = function generateClientTimeZone(gameWeekSchedul
     });
 }
 
-exports.generateClientTimeZoneForPredictedTimw = function generateClientTimeZoneForPredictedTimw(gameWeekSchedule, req){
+exports.generateClientTimeZoneForPredictedTimw = function generateClientTimeZoneForPredictedTimw(gameWeekSchedule, req) {
     //var format = 'YYYY/MM/DD HH:mm:ss ZZ';
     let clientTimeZone = req.cookies.clientOffset;
     gameWeekSchedule.forEach(game => {
-        if (game.predictedTime != 'N/A'){
+        if (game.predictedTime != 'N/A') {
             let format = 'MMM DD YYYY, hh:mm:ss A';
             let date = new Date(game.predictedTime);
             game.predictedTime = mom(date).tz(clientTimeZone).format(format);
@@ -748,13 +786,13 @@ exports.generateClientTimeZoneForPredictedTimw = function generateClientTimeZone
     });
 }
 
-exports.generateClientTimeZoneSingle = function generateClientTimeZoneSingle(deadline, req){
+exports.generateClientTimeZoneSingle = function generateClientTimeZoneSingle(deadline, req) {
     let clientTimeZone = req.cookies.clientOffset;
 
-        let format = 'lll';
-        /*let format = 'MMM DD YYYY, hh:mm:ss A';*/
-        let date = new Date(deadline);
-        return mom(date).tz(clientTimeZone).format(format);
+    let format = 'lll';
+    /*let format = 'MMM DD YYYY, hh:mm:ss A';*/
+    let date = new Date(deadline);
+    return mom(date).tz(clientTimeZone).format(format);
 
 }
 
@@ -777,11 +815,11 @@ exports.setMatchAmounts = function setMatchAmounts(schedule) {
     }
 }
 
-exports.validateUser = async function validateUser(connection, loginDetails){
+exports.validateUser = async function validateUser(connection, loginDetails) {
     let users = await userList.isActiveUser(connection, loginDetails);
     let isActive = false;
-    if (users.length > 0){
-        if (users[0].isActive){
+    if (users.length > 0) {
+        if (users[0].isActive) {
             isActive = true;
         }
     }

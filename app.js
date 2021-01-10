@@ -77,7 +77,6 @@ app.get('/updatePredictions/', predictions.updatePredictions);
 app.get('/matchDayPredictions', predictions.matchDayPredictions);
 app.get('/updateResult', predictions.updateResult);
 app.get('/updatePredictions/:matchNumber/:memberId/:matchDay/:type', predictions.updatePredictions);
-app.post('/savePredictions/:matchDay', predictions.savePredictions);
 app.post('/updatePredictions/:matchNumber/:memberId/:matchDay/:type', predictions.updatePredictionsPost);
 app.post('/savePredictions/:matchNumber/:memberId/:matchDay/:type', predictions.saveSinglePredictions);
 app.post('/updateSinglePredictions/:matchNumber/:memberId/:matchDay/:type', predictions.updateSinglePredictions);

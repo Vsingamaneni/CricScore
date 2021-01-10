@@ -26,6 +26,7 @@ app.use('/public', express.static('public'));
 
 const connection = db.dbConnection();
 
+// Display combined predictions and its status.
 exports.predictions = app.get('/predictions', async (req, res) => {
     try {
         if (req.cookies.loginDetails) {
@@ -83,6 +84,7 @@ exports.predictions = app.get('/predictions', async (req, res) => {
     }
 });
 
+// Display single predictions and option to update.
 exports.viewPredictions = app.get('/viewPredictions', async (req, res) => {
     try {
         if (req.cookies.loginDetails) {
@@ -137,6 +139,7 @@ exports.viewPredictions = app.get('/viewPredictions', async (req, res) => {
     }
 });
 
+// Predict from the combined predictions.
 exports.predict = app.get('/predict/:matchNumber/:memberId/:matchDay/:type', async (req, res) => {
     try {
         if (req.cookies.loginDetails) {
@@ -199,6 +202,7 @@ exports.predict = app.get('/predict/:matchNumber/:memberId/:matchDay/:type', asy
     }
 });
 
+// Predict for a single game.
 exports.predictPerGame = app.get('/predictGame/:matchNumber/:memberId/:matchDay/:type', async (req, res) => {
     try {
         if (req.cookies.loginDetails) {
@@ -249,53 +253,9 @@ exports.predictPerGame = app.get('/predictGame/:matchNumber/:memberId/:matchDay/
     }
 });
 
-// Save the predictions
-exports.savePredictions = app.post('/savePredictions/:matchDay', urlencodedParser, [
-    check('selected1', 'Select All games')
-        /*.custom((value, {req}) => value != '--- Select Result ---')*/
-        .custom((value, {req}) => {
-            const matchDay = req.params.matchDay;
-
-            if (!predictionUtils.validateMatchDay(req, matchDay)) {
-                throw new Error('You are trying to select wrong matches');
-            }
-
-            if (!predictionUtils.validateMemberPredictions(req)) {
-                throw new Error('You must select all games for Matchday : ' + matchDay);
-            }
-            return true;
-        })
-
-], (req, res) => {
-    try {
-        const errors = validationResult(req)
-        if (!errors.isEmpty()) {
-            const alert = errors.array();
-            res.cookie('schedule', null, {expires: new Date(Date.now() + 0 * 0), httpOnly: true});
-            res.cookie('alert', alert, {expires: new Date(Date.now() + 60 * 60000), httpOnly: true});
-            return res.redirect('/predictions');
-        } else {
-            const matchDay = req.params.matchDay;
-            if (predictionUtils.saveSinglePredictions(connection, req, matchDay, res)) {
-                const msg = [];
-                msg.push('Predictions saved successfully for matchDay : ' + matchDay);
-                res.cookie('msg', msg, {expires: new Date(Date.now() + 60 * 60000), httpOnly: true});
-                return res.redirect('/predictions');
-            } else {
-                const fail = [];
-                fail.push('Unable to save predictions for matchDay : ' + matchDay);
-                res.cookie('fail', fail, {expires: new Date(Date.now() + 60 * 60000), httpOnly: true});
-                return res.redirect('/predictions');
-            }
-        }
-    } catch (e) {
-        console.log('error processing predictions save', e);
-        res.redirect('/login');
-    }
-});
-
-exports.saveSinglePredictions = app.post('/savePredictions/:matchNumber/:memberId/:matchDay/:type', urlencodedParser, [
-    check('selected', 'Select All games')
+//Save Single prediction from both the prediction types
+exports.saveSinglePredictions = app.post('/savePredictions/:matchNumber/:memberId/:matchDay/:type', urlencodedParser,  [
+     check('selected', 'Select All games')
         .custom((value, {req}) => {
             const matchNumber = req.params.matchNumber;
 
@@ -305,14 +265,26 @@ exports.saveSinglePredictions = app.post('/savePredictions/:matchNumber/:memberI
             return true;
         })
 
-], (req, res) => {
+], async (req, res) => {
     try {
+        const matchNumber = req.params.matchNumber;
+        let type = req.params.type;
+        let memberId = req.params.memberId;
+        let matchDay = req.params.matchDay;
+
+        if (await predictionUtils.isDeadlineReachedForPrediction(connection, matchNumber)){
+            let alert = [];
+            alert.push('Deadline reached for match # : ' + matchNumber);
+            res.cookie('alert', alert, {expires: new Date(Date.now() + 60 * 60000), httpOnly: true});
+            if (type == 'all') {
+                return res.redirect('/predictions');
+            } else {
+                return res.redirect('/viewPredictions');
+            }
+        }
+
         const errors = validationResult(req)
         if (!errors.isEmpty()) {
-            let matchNumber = req.params.matchNumber;
-            let memberId = req.params.memberId;
-            let matchDay = req.params.matchDay;
-            let type = req.params.type;
 
             const alert = errors.array();
             res.cookie('schedule', null, {expires: new Date(Date.now() + 0 * 0), httpOnly: true});
@@ -371,12 +343,23 @@ exports.updateSinglePredictions = app.post('/updateSinglePredictions/:matchNumbe
 
 ], async (req, res) => {
     try {
+        let matchNumber = req.params.matchNumber;
+        let type = req.params.type;
+        if (await predictionUtils.isDeadlineReachedForPrediction(connection, matchNumber)){
+            let alert = [];
+            alert.push('Deadline reached for match # : ' + matchNumber);
+            res.cookie('alert', alert, {expires: new Date(Date.now() + 60 * 60000), httpOnly: true});
+            if (type == 'all') {
+                return res.redirect('/predictions');
+            } else {
+                return res.redirect('/viewPredictions');
+            }
+        }
+
         const errors = validationResult(req)
         if (!errors.isEmpty()) {
-            let matchNumber = req.params.matchNumber;
             let memberId = req.params.memberId;
             let matchDay = req.params.matchDay;
-            let type = req.params.type;
 
             const alert = errors.array();
             res.cookie('schedule', null, {expires: new Date(Date.now() + 0 * 0), httpOnly: true});
