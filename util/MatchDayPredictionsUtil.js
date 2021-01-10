@@ -141,6 +141,9 @@ exports.generateMatchDayDetails = function generateMatchDayDetails(loginDetails,
         let adminFees = 0;
         let homeTeamPrice = (defaultCount * schedule.minAmount) + awayTotal;
         adminFees = Number((homeTeamPrice * 0.05).toFixed(2));
+        if (loginDetails.role == 'admin') {
+            matchDayDetails.homeTeamWinFees = adminFees;
+        }
         homeTeamPrice = homeTeamPrice - adminFees;
         for (const [key, value] of homeTeam.entries()) {
             value.winning = Number(((key / homeTotal) * homeTeamPrice).toFixed(2));
@@ -153,6 +156,9 @@ exports.generateMatchDayDetails = function generateMatchDayDetails(loginDetails,
         let isAwaySelection = userSelected == 'away' ? true : false;
         let awayTeamPrice = (defaultCount * schedule.minAmount) + homeTotal;
         adminFees = Number((awayTeamPrice * 0.05).toFixed(2));
+        if (loginDetails.role == 'admin') {
+            matchDayDetails.awayTeamWinFees = adminFees;
+        }
         awayTeamPrice = awayTeamPrice - adminFees;
         for (const [key, value] of awayTeam.entries()) {
             value.winning = Number(((key / awayTotal) * awayTeamPrice).toFixed(2));

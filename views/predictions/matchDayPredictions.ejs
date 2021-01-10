@@ -98,7 +98,11 @@
                 <table class="table table-dark table-striped" >
                     <tr>
                         <td style="padding: 5px;font-size:20px;border: 1px solid black;">
-                            <p style="text-align:center;"><%= matchDay.schedule.homeTeam %> - <%= matchDay.schedule.homeCount %></p>
+                            <p style="text-align:center;"><%= matchDay.schedule.homeTeam %> - <%= matchDay.schedule.homeCount %>
+                             <% if (undefined != matchDay.homeTeamWinFees) {%>
+                                    - ( <%= matchDay.homeTeamWinFees%> )
+                              <%}%>
+                            </p>
                             <table style="margin:0 auto;border: 1px solid black;width:85%;">
                                 <tr style="text-align:center;background-color: #5b5d5d;font-size: 18px;">
                                     <td style="padding: 5px;font-size:20px;border: 1px solid black;">Count</td>
@@ -127,7 +131,11 @@
                             </table>
                         </td>
                         <td style="padding: 5px;font-size:20px;border: 1px solid black;">
-                            <p style="text-align:center;"><%= matchDay.schedule.awayTeam %> - <%= matchDay.schedule.awayCount %></p>
+                            <p style="text-align:center;"><%= matchDay.schedule.awayTeam %> - <%= matchDay.schedule.awayCount %>
+                                <% if (undefined != matchDay.homeTeamWinFees) {%>
+                                  - ( <%= matchDay.awayTeamWinFees%> )
+                                <%}%>
+                            </p>
                             <table style="margin:0 auto;border: 1px solid black;width:85%;">
                                 <tr style="text-align:center;background-color: #5b5d5d;font-size: 18px;width:90%;">
                                     <td style="padding: 5px;font-size:20px;border: 1px solid black;">Count</td>

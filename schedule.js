@@ -34,8 +34,7 @@ exports.dashboard = app.get('/dashboard', async (req, res) => {
 
             return res.render('schedule/dashboard', {
                 title: 'Dashboard',
-                team: loginDetails.team,
-                fname: loginDetails.fName,
+                loginDetails: loginDetails,
                 dashboard: schedule[0]
             });
         } else {
@@ -57,8 +56,7 @@ exports.schedule = app.get('/schedule', async (req, res) => {
 
             res.render('schedule/schedule', {
                 title: 'Schedule ',
-                team: loginDetails.team,
-                fname: loginDetails.fName,
+                loginDetails: loginDetails,
                 schedule: schedule,
                 scheduleMap: scheduleMap
             });

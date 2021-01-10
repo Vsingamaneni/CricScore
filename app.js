@@ -50,15 +50,15 @@ app.use('/public', express.static('public'));
 //app.get('/', userSession.login);
 app.get('/login', userSession.login);
 app.get('/register', userSession.register);
-app.post('/userLogin', userSession.userLogin);
-app.post('/registerSave', userSession.registerUser);
 app.get('/forget', userSession.forgetPass);
-app.post('/retrieveUser', userSession.retrieveUser);
-app.post('/validateSecurity', userSession.validateSecurityAnswer);
-app.post('/updatePass', userSession.updatePassword);
 app.get('/users', userSession.usersList);
 app.get('/activate/:memberId', userSession.activateMember);
 app.get('/deActivate/:memberId', userSession.deActivateMember);
+app.post('/userLogin', userSession.userLogin);
+app.post('/registerSave', userSession.registerUser);
+app.post('/retrieveUser', userSession.retrieveUser);
+app.post('/validateSecurity', userSession.validateSecurityAnswer);
+app.post('/updatePass', userSession.updatePassword);
 
 
 // Schedule routes
@@ -73,13 +73,15 @@ app.get('/predictions', predictions.predictions);
 app.get('/viewPredictions', predictions.viewPredictions);
 app.get('/predict/:matchNumber/:memberId/:matchDay/:type', predictions.predict);
 app.get('/predictGame/:matchNumber/:memberId/:matchDay/:type', predictions.predictPerGame);
-app.post('/savePredictions/:matchDay', predictions.savePredictions);
+app.get('/updatePredictions/', predictions.updatePredictions);
+app.get('/matchDayPredictions', predictions.matchDayPredictions);
+app.get('/updateResult', predictions.updateResult);
 app.get('/updatePredictions/:matchNumber/:memberId/:matchDay/:type', predictions.updatePredictions);
+app.post('/savePredictions/:matchDay', predictions.savePredictions);
 app.post('/updatePredictions/:matchNumber/:memberId/:matchDay/:type', predictions.updatePredictionsPost);
 app.post('/savePredictions/:matchNumber/:memberId/:matchDay/:type', predictions.saveSinglePredictions);
 app.post('/updateSinglePredictions/:matchNumber/:memberId/:matchDay/:type', predictions.updateSinglePredictions);
-app.get('/updatePredictions/', predictions.updatePredictions);
-app.get('/matchDayPredictions', predictions.matchDayPredictions);
+app.post('/updateMatchResult/:matchNumber', predictions.updateMatchResult);
 
 app.get('/users',(req, res) => {
     //res.send('Hello There');
@@ -105,8 +107,6 @@ app.get('/',(req, res) => {
         });
     });
 });
-
-
 app.get('/add',(req, res) => {
     res.render('user_add', {
         title : 'DB Operations'

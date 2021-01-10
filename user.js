@@ -275,8 +275,7 @@ exports.usersList = app.get('/users', async (req, res) => {
 
         res.render('users/users', {
             title: 'Users List',
-            team: loginDetails.team,
-            fname: loginDetails.fName,
+            loginDetails: loginDetails,
             usersList: usersList,
             loginDetails: loginDetails,
             alert,

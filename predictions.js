@@ -64,8 +64,7 @@ exports.predictions = app.get('/predictions', async (req, res) => {
 
             res.render('predictions/prediction', {
                 title: 'Predictions ',
-                team: loginDetails.team,
-                fname: loginDetails.fName,
+                loginDetails: loginDetails,
                 schedule: gameWeekSchedule,
                 memberId: loginDetails.memberId,
                 userLogin: loginDetails,
@@ -121,8 +120,7 @@ exports.viewPredictions = app.get('/viewPredictions', async (req, res) => {
 
             res.render('predictions/userPrediction', {
                 title: 'User Predictions ',
-                team: loginDetails.team,
-                fname: loginDetails.fName,
+                loginDetails: loginDetails,
                 memberId: loginDetails.memberId,
                 viewPredictions: predictions,
                 type: type,
@@ -183,8 +181,7 @@ exports.predict = app.get('/predict/:matchNumber/:memberId/:matchDay/:type', asy
 
             return res.render('predictions/matchPredictions', {
                 title: 'Match Day Predictions ',
-                team: loginDetails.team,
-                fname: loginDetails.fName,
+                loginDetails: loginDetails,
                 schedule: schedule,
                 memberId: loginDetails.memberId,
                 matchDay: matchDay,
@@ -235,8 +232,7 @@ exports.predictPerGame = app.get('/predictGame/:matchNumber/:memberId/:matchDay/
 
             return res.render('predictions/matchPredictions', {
                 title: 'Match Predictions',
-                team: loginDetails.team,
-                fname: loginDetails.fName,
+                loginDetails: loginDetails,
                 schedule: schedule,
                 memberId: loginDetails.memberId,
                 matchDeadline: matchDeadline,
@@ -489,8 +485,7 @@ exports.updatePredictions = app.get('/updatePredictions/:matchNumber/:memberId/:
 
         return res.render('predictions/updatePredictions', {
             title: 'Update Prediction',
-            team: loginDetails.team,
-            fname: loginDetails.fName,
+            loginDetails: loginDetails,
             schedule: predictions,
             memberId: loginDetails.memberId,
             matchDay: matchDay,
@@ -553,8 +548,7 @@ exports.matchDayPredictions = app.get('/matchDayPredictions', async (req, res) =
 
             return res.render('predictions/matchDayPredictions', {
                 title: 'Match Day Predictions',
-                team: loginDetails.team,
-                fname: loginDetails.fName,
+                loginDetails: loginDetails,
                 matchDayPredictions: matchDayPredictions,
                 memberId: loginDetails.memberId,
                 msg: msg
@@ -569,3 +563,32 @@ exports.matchDayPredictions = app.get('/matchDayPredictions', async (req, res) =
     }
 });
 
+exports.updateResult = app.get('/updateResult', async (req, res) => {
+    try {
+        if (req.cookies.loginDetails) {
+            let loginDetails = JSON.parse(req.cookies.loginDetails);
+            if (loginDetails.role != 'admin'){
+                return res.redirect("/predictions");
+            }
+
+            let matchDaySchedule = await predictionUtils.getActiveMatchDaySchedule(connection);
+
+            return res.render('predictions/updateResult', {
+                title: 'Update Result',
+                loginDetails: loginDetails,
+                schedule: matchDaySchedule,
+            });
+        }
+        return res.render('login/login', {
+            title: 'Scoreboard'
+        });
+    } catch (e) {
+        console.log('error processing update result : ', e);
+        res.redirect('/login');
+    }
+});
+
+exports.updateMatchResult = app.post('/updateMatchResult/:matchNumber', async (req, res) => {
+
+    return res.redirect('/updatePredictions/:matchNumber/:memberId/:matchDay/:type');
+});
