@@ -6,25 +6,25 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
     <%- include('../header.ejs') %>
 </head>
-<body style="background-color: #f6f7fa;" >
+<body style="background-color: #f6f7fa;">
 
 <div>
     <%- include('../body.ejs') %>
     <div class="content" style="background-color:#f6f7fa">
         <br><br><br><br>
         <% if (dashboard !== undefined) { %>
-<!--        <div style="margin: 0 auto; text-align: center; width: 80%; font-size: 60px; border: 2px solid #29dd9e; padding: 10px; border-radius: 50px 20px;text-shadow: -1px 0 black, 0 1px black, 1px 0 black, 0 -1px black;">
-            <p id="demo"></p>
-        </div>-->
+            <!--        <div style="margin: 0 auto; text-align: center; width: 80%; font-size: 60px; border: 2px solid #29dd9e; padding: 10px; border-radius: 50px 20px;text-shadow: -1px 0 black, 0 1px black, 1px 0 black, 0 -1px black;">
+                        <p id="demo"></p>
+                    </div>-->
 
-        <div style="width: 80%; margin:0 auto; text-align: center; font-size: 60px; /*border: 2px solid #465b54; border-radius: 50px 20px;*/ color: #84e5d8; text-shadow: -1px 0 black, 0 1px black, 1px 0 black, 0 -1px black;">
-            <p id="demo"></p>
-        </div>
-        <!--<p style="margin:0 auto; text-align: center; font-size: 60px; margin-top: 0px; width: 60%; border: 3px solid #315f00;color: #84e5d8; text-shadow: -1px 0 black, 0 1px black, 1px 0 black, 0 -1px black;" id="demo"></p>-->
-        <script>
+            <div style="width: 80%; margin:0 auto; text-align: center; font-size: 60px; /*border: 2px solid #465b54; border-radius: 50px 20px;*/ color: #84e5d8; text-shadow: -1px 0 black, 0 1px black, 1px 0 black, 0 -1px black;">
+                <p id="demo"></p>
+            </div>
+            <!--<p style="margin:0 auto; text-align: center; font-size: 60px; margin-top: 0px; width: 60%; border: 3px solid #315f00;color: #84e5d8; text-shadow: -1px 0 black, 0 1px black, 1px 0 black, 0 -1px black;" id="demo"></p>-->
+            <script>
                 // Set the date we're counting down to
                 // var countDownDate = new Date("Dec 3, 2020 15:37:25").getTime();
-                var countDownDate =  new Date('<%= dashboard.deadline %>'.replace(/\s/, 'T')).getTime();
+                var countDownDate = new Date('<%= dashboard.deadline %>'.replace(/\s/, 'T')).getTime();
                 // Update the count down every 1 second
                 var x = setInterval(function () {
 
@@ -41,17 +41,17 @@
                     var seconds = Math.floor((distance % (1000 * 60)) / 1000);
 
                     // Output the result in an element with id="demo"
-                    document.getElementById("demo").innerHTML = "GW # <%= dashboard.matchDay %> : " + days + "d " + hours + "h "
+                    document.getElementById("demo").innerHTML = "M# <%= dashboard.matchNumber %> : " + days + "d " + hours + "h "
                         + minutes + "m " + seconds + "s ";
 
                     // If the count down is over, write some text
                     if (distance < 0) {
                         clearInterval(x);
-                        document.getElementById("demo").innerHTML = "GW # <%= dashboard.matchDay %> : " + "Time Up";
+                        document.getElementById("demo").innerHTML = "M# <%= dashboard.matchNumber %> : " + "Time Up";
                     }
                 }, 1000);
-        </script>
-        <br>
+            </script>
+            <br>
         <% } %>
         <br><br>
 
@@ -83,6 +83,17 @@
                     lovely shadowed box adasd asdasda asdadas asdadas asdadas asdada.</p>
             </details>
         </div>-->
+        <div style="width: 80%; margin:0 auto; text-align: center; font-size: 60px; color: #84e5d8; text-shadow: -1px 0 black, 0 1px black, 1px 0 black, 0 -1px black;">
+            <img src="../images/teams/CSK.png" style="width: 150px;text-align: center;">&nbsp;&nbsp;<img
+                    src="../images/teams/DC.png" style="width: 150px;">&nbsp;&nbsp;<img src="../images/teams/KKR.png"
+                                                                                        style="width: 150px;">&nbsp;&nbsp;<img
+                    src="../images/teams/KXIP.png" style="width: 150px;">
+            <br>
+            <img src="../images/teams/MI.png" style="width: 150px;">&nbsp;&nbsp;<img src="../images/teams/RCB.png"
+                                                                                     style="width: 150px;">&nbsp;&nbsp;<img
+                    src="../images/teams/RR.png" style="width: 150px;">&nbsp;&nbsp;<img src="../images/teams/SRH.png"
+                                                                                        style="width: 150px;">
+        </div>
         <div>
         </div>
     </div>

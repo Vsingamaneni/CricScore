@@ -53,7 +53,8 @@
                 <% viewPredictions.forEach(function(match){ %>
                     <tr style="font-size: 18px;">
                         <td><%= match.matchNumber %></td>
-                        <td><%= match.game %></td>
+                        <!--<td><%= match.game %>  &#45;&#45; <%= match.homeTeam%> vs <%= match.awayTeam%></td>-->
+                        <td style="margin: 0 auto;"><img src="../images/teams/<%= match.homeTeam %>.png" style="width: 50px;">&nbsp; x &nbsp;<img src="../images/teams/<%= match.awayTeam %>.png" style="width: 50px;"> </td>
                         <td><%= match.localDate %></td>
                         <td><%= match.predictedTime %></td>
                         <td><%= match.selected %></td>
