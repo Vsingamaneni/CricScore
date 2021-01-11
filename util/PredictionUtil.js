@@ -105,10 +105,8 @@ exports.getMatchSchedule = async function getMatchSchedule(connection, matchNumb
             } else {
                 if (results.length > 0) {
                     results.forEach(function (item) {
-                        if (!item.done) {
-                            item.deadline = clientTimeZoneMoment(item.deadline, req.cookies.clientOffset);
-                            matches.push(item);
-                        }
+                        item.deadline = clientTimeZoneMoment(item.deadline, req.cookies.clientOffset);
+                        matches.push(item);
                     });
                     resolve(matches);
                 } else {
@@ -134,9 +132,7 @@ async function getMatchScheduleLocalTime(connection, matchNumber) {
             } else {
                 if (results.length > 0) {
                     results.forEach(function (item) {
-                        if (!item.done) {
-                            matches.push(item);
-                        }
+                        matches.push(item);
                     });
                     resolve(matches);
                 } else {

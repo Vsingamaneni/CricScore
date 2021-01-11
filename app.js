@@ -11,6 +11,7 @@ var jstz = require('jstz');
 var userSession = require('./user');
 var schedule = require('./schedule');
 var predictions = require('./predictions');
+var adminAction = require('./adminActions');
 var db = require('./db');
 
 const app = express();
@@ -75,12 +76,14 @@ app.get('/predict/:matchNumber/:memberId/:matchDay/:type', predictions.predict);
 app.get('/predictGame/:matchNumber/:memberId/:matchDay/:type', predictions.predictPerGame);
 app.get('/updatePredictions/', predictions.updatePredictions);
 app.get('/matchDayPredictions', predictions.matchDayPredictions);
-app.get('/updateResult', predictions.updateResult);
 app.get('/updatePredictions/:matchNumber/:memberId/:matchDay/:type', predictions.updatePredictions);
 app.post('/updatePredictions/:matchNumber/:memberId/:matchDay/:type', predictions.updatePredictionsPost);
 app.post('/savePredictions/:matchNumber/:memberId/:matchDay/:type', predictions.saveSinglePredictions);
 app.post('/updateSinglePredictions/:matchNumber/:memberId/:matchDay/:type', predictions.updateSinglePredictions);
-app.post('/updateMatchResult/:matchNumber', predictions.updateMatchResult);
+
+// Admin Action Routes
+app.get('/updateResult', adminAction.updateResult);
+app.post('/updateMatchResult/:matchNumber', adminAction.updateMatchResult);
 
 app.get('/users',(req, res) => {
     //res.send('Hello There');

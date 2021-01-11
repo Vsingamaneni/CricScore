@@ -29,10 +29,11 @@
         <br><br><br><br>
         <br><br><br><br>
 
-        <!--        <% if(typeof msg != 'undefined') { %>
+        <% if(typeof msg != 'undefined') { %>
             <br/>
             <% msg.forEach(function(success) { %>
-                <div style="color:#4c4e4b;text-align: center;font-size: 18px; font-weight: 900; font-family: Roboto, sans-serif;" role="alert">
+                <div style="color:#4c4e4b;text-align: center;font-size: 18px; font-weight: 900; font-family: Roboto, sans-serif;"
+                     role="alert">
                     <i><%= success %></i>
                 </div>
                 <br><br><br>
@@ -42,12 +43,13 @@
         <% if(typeof alert != 'undefined') { %>
             <br/>
             <% alert.forEach(function(error) { %>
-                <div style="color:red;text-align: center;font-size: 18px; font-weight: 900; font-family: Roboto, sans-serif;" role="alert">
-                    <%= error.msg %>
+                <div style="color:red;text-align: center;font-size: 18px; font-weight: 900; font-family: Roboto, sans-serif;"
+                     role="alert">
+                    <%= error %>
                 </div>
                 <br><br><br>
             <% }) %>
-        <% } %>-->
+        <% } %>
 
         <% schedule.forEach(function(match) { %>
             <div class="container">
@@ -68,7 +70,8 @@
                             <td><%= match.matchNumber %></td>
                             <td><%= match.homeTeam %> vs <%= match.awayTeam %></td>
 
-                            <td><select name="selected" style="background-color: #f1f4f5; color:black; padding: 6px 10px;margin: 8px 0; display: inline-block;border: 1px solid #ccc;border-radius: 4px; box-sizing: border-box; font-size: 15px; font-weight: 900;"
+                            <td><select name="selected"
+                                        style="background-color: #f1f4f5; color:black; padding: 6px 10px;margin: 8px 0; display: inline-block;border: 1px solid #ccc;border-radius: 4px; box-sizing: border-box; font-size: 15px; font-weight: 900;"
                                         required>
                                     <option style="margin: 0 auto;">--- Update Result ---</option>
                                     <option style="text-align:center;"><%= match.homeTeam %></option>
@@ -87,8 +90,8 @@
                     </table>
                 </form>
             </div>
-        <%})%>
-            <br><br><br>
+        <% }) %>
+        <br><br><br>
         <!--
                 <div style="width: 100px; margin-left: auto; margin-right: auto;color: white;">
                     <a href="/predictions" class="next">&laquo; BACK</a>

@@ -183,6 +183,7 @@ exports.generateMatchDayDetails = function generateMatchDayDetails(loginDetails,
     matchDayDetails.homeTeam = sortMap(homeTeam);
     matchDayDetails.awayTeam = sortMap(awayTeam);
     matchDayDetails.currentUserPrediction = currentUserPrediction;
+    matchDayDetails.predictions = predictions;
 
     return matchDayDetails;
 }

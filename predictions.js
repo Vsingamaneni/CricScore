@@ -503,7 +503,6 @@ exports.matchDayPredictions = app.get('/matchDayPredictions', async (req, res) =
                     }
                 });
             }
-            let memberId = loginDetails.memberId;
             let users = [];
             let matchDayPredictions = [];
             let singleMatchPredictions = [];
@@ -544,34 +543,4 @@ exports.matchDayPredictions = app.get('/matchDayPredictions', async (req, res) =
         console.log('error processing predictions', e);
         res.redirect('/login');
     }
-});
-
-exports.updateResult = app.get('/updateResult', async (req, res) => {
-    try {
-        if (req.cookies.loginDetails) {
-            let loginDetails = JSON.parse(req.cookies.loginDetails);
-            if (loginDetails.role != 'admin'){
-                return res.redirect("/predictions");
-            }
-
-            let matchDaySchedule = await predictionUtils.getActiveMatchDaySchedule(connection);
-
-            return res.render('predictions/updateResult', {
-                title: 'Update Result',
-                loginDetails: loginDetails,
-                schedule: matchDaySchedule,
-            });
-        }
-        return res.render('login/login', {
-            title: 'Scoreboard'
-        });
-    } catch (e) {
-        console.log('error processing update result : ', e);
-        res.redirect('/login');
-    }
-});
-
-exports.updateMatchResult = app.post('/updateMatchResult/:matchNumber', async (req, res) => {
-
-    return res.redirect('/updatePredictions/:matchNumber/:memberId/:matchDay/:type');
 });
