@@ -12,6 +12,8 @@ var userSession = require('./user');
 var schedule = require('./schedule');
 var predictions = require('./predictions');
 var adminAction = require('./adminActions');
+var resultAction = require('./resultActions');
+
 var db = require('./db');
 
 const app = express();
@@ -84,6 +86,10 @@ app.post('/updateSinglePredictions/:matchNumber/:memberId/:matchDay/:type', pred
 // Admin Action Routes
 app.get('/updateResult', adminAction.updateResult);
 app.post('/updateMatchResult/:matchNumber', adminAction.updateMatchResult);
+
+// Result consolidation actions
+app.get('/standings', resultAction.standings);
+app.get('/history/:memberId', resultAction.history);
 
 app.get('/users',(req, res) => {
     //res.send('Hello There');

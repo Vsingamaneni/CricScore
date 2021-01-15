@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title><%= title %></title>
+    <link rel="stylesheet" href="/css/dashboard.css">
+    <link rel="stylesheet" href="/css/schedule.css">
+    <%- include('../header.ejs') %>
+</head>
+<body style="background-color: #f6f7fa;">
+
+<div>
+    <%- include('../body.ejs') %>
+    <div class="content" style="background-color:#f6f7fa">
+        <br><br><br><br>
+        <br><br><br><br>
+
+        <% if(typeof msg != 'undefined') { %>
+            <br/>
+            <% msg.forEach(function(success) { %>
+                <div style="color:#6bec10;text-align: center;font-size: 25px; font-weight: 900; font-family: Roboto, sans-serif;"
+                     role="alert">
+                    <%= success %>
+                </div>
+                <br><br><br>
+            <% }) %>
+        <% } %>
+        <% if(typeof alert != 'undefined') { %>
+            <br/>
+            <% alert.forEach(function(error) { %>
+                <div style="color:red;text-align: center;font-size: 25px; font-weight: 900; font-family: Roboto, sans-serif;"
+                     role="alert">
+                    <i><%= error %></i>
+                </div>
+                <br><br><br>
+            <% }) %>
+        <% } %>
+
+        <% if (userName != undefined) { %>
+        <h1 style="text-align: center; color: #19B3D3;"><i><%= userName %>'s History  </i></h1>
+        <% } %>
+        <br><br>
+        <div class="container">
+            <table class="table table-dark table-striped" style="width:95%;">
+                <thead>
+                <tr style="background-color: #5b5d5d;font-size: 18px;">
+                    <th><i>#</i></th>
+                    <th><i>MATCH</i></th>
+                    <th><i>SELECTED</i></th>
+                    <th><i>BET</i></th>
+                    <th><i>WINNER</i></th>
+                    <th><i>WON</i></th>
+                    <th><i>LOST</i></th>
+                    <th><i>NET</i></th>
+                </tr>
+                </thead>
+                <tbody>
+                <% standings.forEach(function(standing){ %>
+                    <% if (standing.result == 'won') { %>
+                    <tr style="color: #97f555;font-size: 18px;height: 15px;">
+                        <% } %>
+                        <% if (standing.result == 'lost') { %>
+                    <tr style="color: #ee0673;font-size: 18px;">
+                        <% } %>
+                        <% if (standing.result == 'default') { %>
+                    <tr style="color: #15dddd;font-size: 18px;">
+                        <% } %>
+                        <td><%= standing.matchNumber %></td>
+                        <td><%= standing.homeTeam %> vs <%= standing.awayTeam %>
+                        </td>
+                        <td><%= standing.selected %></td>
+                        <td><%= standing.amount %></td>
+                        <td><%= standing.winner %></td>
+                        <td><%= standing.wonAmount %></td>
+                        <td><%= standing.lostAmount %></td>
+                        <td><%= standing.net %></td>
+                    </tr>
+                    <tr style="height: 5px;"></tr>
+                <% }); %>
+                </tbody>
+            </table>
+            <br>
+            <div style="width: 100px; margin-left: auto; margin-right: auto;color: white;">
+                <a href="/standings" class="next">&laquo; BACK</a>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+</body>
+</html>

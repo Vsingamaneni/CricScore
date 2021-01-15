@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title><%= title %></title>
+    <link rel="stylesheet" href="/css/dashboard.css">
+    <link rel="stylesheet" href="/css/schedule.css">
+    <%- include('../header.ejs') %>
+</head>
+<body style="background-color: #f6f7fa;">
+
+<div>
+    <%- include('../body.ejs') %>
+    <div class="content" style="background-color:#f6f7fa">
+        <br><br><br><br>
+        <br><br><br><br>
+
+        <% if(typeof msg != 'undefined') { %>
+            <br/>
+            <% msg.forEach(function(success) { %>
+                <div style="color:#6bec10;text-align: center;font-size: 25px; font-weight: 900; font-family: Roboto, sans-serif;"
+                     role="alert">
+                    <%= success %>
+                </div>
+                <br><br><br>
+            <% }) %>
+        <% } %>
+        <% if(typeof alert != 'undefined') { %>
+            <br/>
+            <% alert.forEach(function(error) { %>
+                <div style="color:red;text-align: center;font-size: 25px; font-weight: 900; font-family: Roboto, sans-serif;"
+                     role="alert">
+                    <i><%= error %></i>
+                </div>
+                <br><br><br>
+            <% }) %>
+        <% } %>
+
+        <div class="container">
+            <table class="table table-dark table-striped" style="width:95%;">
+                <thead>
+                <tr style="background-color: #5b5d5d;font-size: 18px;">
+                    <th><i>#</i></th>
+                    <th><i>NAME</i></th>
+                    <th><i>WON</i></th>
+                    <th><i>LOST</i></th>
+                    <th><i>NET</i></th>
+                    <th><i>STATUS</i></th>
+                </tr>
+                </thead>
+                <tbody><% standings.forEach(function(standing){ %>
+                    <% if (standing.active) { %>
+                        <tr style="background-color: #19B3D3;font-size: 18px;">
+                     <% } %>
+                    <% if (!standing.active) { %>
+                        <tr style="font-size: 18px;">
+                    <% } %>
+                        <td><%= standing.rank %></td>
+                        <td><a href="/history/<%= standing.memberId %>" style="text-decoration: none;color: white;hover "><%= standing.name %></a></td>
+                        <td><%= standing.won %></td>
+                        <td><%= standing.lost %></td>
+                        <td><%= standing.net %></td>
+                        <% if (standing.status == 'ACTIVE') {%>
+                            <td><a href="#" class="predict_btn">ACTIVE</a></td>
+                        <% } %>
+                        <% if (standing.status == 'INACTIVE') {%>
+                            <td><a href="#" class="predict_inactive_btn">IN ACTIVE</a></td>
+                        <% } %>
+                    </tr>
+                    <tr style="height: 5px;"></tr>
+                <% }); %>
+                </tbody>
+            </table>
+        </div>
+
+    </div>
+</div>
+
+</body>
+</html>

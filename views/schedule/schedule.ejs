@@ -25,30 +25,31 @@
                 </tr>
                 </thead>
                 <tbody>
-                <tr style="height: 10px;"></tr>
+                <tr style="height: 8px;"></tr>
                 <% for (const [key, value] of scheduleMap.entries()) { %>
                     <% value.forEach(function(game){ %>
-                    <% if (game.isActive) { %>
-                            <tr style="background-color: #19B3D3;font-size: 18px;">
-                        <% } %>
-                        <% if (!game.isActive) { %>
-                            <tr style="font-size: 18px;">
-                        <% } %>
-                        <td><%= game.matchDay %></td>
-                        <td><%= game.homeTeam %> vs <%= game.awayTeam %></td>
-                        <td><%= game.momentClientTime %></td>
-                        <td><%= game.venue %></td>
-                        <td>
-                            <% if (game.winner !== undefined) { %>
-                                <%= game.winner %>
+                        <% if (game.isActive) { %>
+                        <tr style="background-color: #19B3D3;font-size: 18px;">
                             <% } %>
-                            <% if (game.winner == undefined) { %>
-                                TBP
+                            <% if (!game.isActive) { %>
+                        <tr style="font-size: 18px;">
                             <% } %>
-                        </td>
-                    </tr>
+                            <td><%= game.matchDay %></td>
+                            <td><%= game.homeTeam %> vs <%= game.awayTeam %></td>
+                            <td><%= game.momentClientTime %></td>
+                            <td><%= game.venue %></td>
+                            <td>
+                                <% if (game.winner !== undefined) { %>
+                                    <%= game.winner %>
+                                <% } %>
+                                <% if (game.winner == undefined) { %>
+                                    TBP
+                                <% } %>
+                            </td>
+                        </tr>
+                        <tr></tr>
                     <% }); %>
-                    <tr style="height: 10px;"></tr>
+                    <tr style="height: 5px;"></tr>
                 <% } %>
 
                 </tbody>
