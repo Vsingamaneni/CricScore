@@ -93,7 +93,9 @@ exports.getHistory = async function getHistory(connection, id) {
                             standing.net = standing.lostAmount;
                         }
 
-                        standing.net = net;
+                        standing.net = net.toFixed(2);
+
+                        standing.net = Number(Math.round(net+'e2')+'e-2');
 
                         userStandings.push(standing);
                     });
@@ -106,6 +108,34 @@ exports.getHistory = async function getHistory(connection, id) {
     });
 
     return userStandings;
+}
+
+exports.getResults = async function getResults(connection) {
+
+    let sql = `select * from RESULTS`;
+    let matchResults = [];
+    let net = 0;
+    await new Promise((resolve, reject) => {
+        connection.query(sql, function (err, results) {
+            if (err) {
+                reject(err);
+            } else {
+
+                if (results.length > 0) {
+                    results.forEach(function (matchResult) {
+                        net = matchResult.adminAmount + net;
+                        matchResult.net = net;
+                        matchResults.push(matchResult);
+                    });
+                    resolve(matchResults);
+                } else {
+                    resolve(matchResults);
+                }
+            }
+        });
+    });
+
+    return matchResults;
 }
 
 // Helper Functions

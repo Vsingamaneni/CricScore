@@ -95,8 +95,11 @@
                                 <a href="/updatePredictions/<%= match.matchNumber %>/<%= memberId %>/<%= match.matchDay %>/<%= type %>"
                                    class="predicted_btn">Update</a>
                             <% } %>
-                            <% if (match.isDeadlineReached) { %>
+                            <% if (match.isDeadlineReached && !match.isPartial) { %>
                                 <i style="color:#c0dd41;">Deadline Reached</i>
+                            <% } %>
+                            <% if (match.isDeadlineReached && match.isPartial) { %>
+                                <i style="color:#c0dd41;">Partial Deadline</i>
                             <% } %>
                         </td>
                     </tr>

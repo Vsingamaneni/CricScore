@@ -20,22 +20,22 @@ app.use(express.static(__dirname + '/public'));
 app.use('/public', express.static('public'));
 
 
-exports.processUpdateResult = async function processUpdateResult(connection, matchDayDetails, winner, req, res){
+exports.processUpdateResult = async function processUpdateResult(connection, matchDayDetails, winner, req, res) {
     let allOperationsDone = false;
     // Get All the predictions -> Transform to standings and set the amount won vs amount loss
     let currentMatchDetails = matchDayDetails[0];
     let schedule = currentMatchDetails.schedule;
 
-    let standingsUpdateStatus = await updateStandings(connection, generateStandings(winner, currentMatchDetails), schedule, winner,res);
+    let standingsUpdateStatus = await updateStandings(connection, generateStandings(winner, currentMatchDetails), schedule, winner, res);
 
     // Update Schedule with result and update the isActive= false;
     let scheduleUpdateStatus = await updateSchedule(connection, schedule, winner, res);
 
     // Update the result with the new record and add the admin fees.
-    let adminAmount =0;
-    if (schedule.homeTeam == winner){
+    let adminAmount = 0;
+    if (schedule.homeTeam == winner) {
         adminAmount = currentMatchDetails.homeTeamWinFees;
-    } else if (schedule.awayTeam == winner){
+    } else if (schedule.awayTeam == winner) {
         adminAmount = currentMatchDetails.awayTeamWinFees;
     }
 
@@ -44,37 +44,37 @@ exports.processUpdateResult = async function processUpdateResult(connection, mat
     // Update the next match to become active if required.
     let scheduleCount = await predictionUtils.getMatchdaySchedule(connection, schedule.matchDay, req);
     let isMatchDayUpdate;
-    if (scheduleCount.length == 0){
-        isMatchDayUpdate = await updateMatchday(connection, schedule.matchDay+1, res);
+    if (scheduleCount.length == 0) {
+        isMatchDayUpdate = await updateMatchday(connection, schedule.matchDay + 1, res);
     } else {
         isMatchDayUpdate = true;
     }
 
-    if (standingsUpdateStatus && scheduleUpdateStatus && isResultUpdated && isMatchDayUpdate){
+    if (standingsUpdateStatus && scheduleUpdateStatus && isResultUpdated && isMatchDayUpdate) {
         return true;
     }
 
     return false;
 }
 
-function generateStandings(winner, currentMatchDetails){
+function generateStandings(winner, currentMatchDetails) {
     let standings = [];
     let schedule = currentMatchDetails.schedule;
     let predictions = currentMatchDetails.predictions;
-    let winningAmounts ;
+    let winningAmounts;
 
-    if (schedule.homeTeam == winner){
+    if (schedule.homeTeam == winner) {
         winningAmounts = currentMatchDetails.homeTeam;
-    } else if (schedule.awayTeam == winner){
+    } else if (schedule.awayTeam == winner) {
         winningAmounts = currentMatchDetails.awayTeam;
     }
 
-    if (winner == schedule.homeTeam || winner == schedule.awayTeam){
-        predictions.forEach(prediction =>{
+    if (winner == schedule.homeTeam || winner == schedule.awayTeam) {
+        predictions.forEach(prediction => {
             prediction.name = prediction.firstName;
-            if (prediction.selected == winner){
+            if (prediction.selected == winner) {
                 for (const [key, value] of winningAmounts.entries()) {
-                    if (prediction.amount == key){
+                    if (prediction.amount == key) {
                         prediction.wonAmount = value.winning;
                     }
                 }
@@ -86,13 +86,19 @@ function generateStandings(winner, currentMatchDetails){
             standings.push(prediction);
         })
     } else {
-        // Match is Draw.No need to update standings.
+        // Match is draw.
+        predictions.forEach(prediction => {
+            prediction.name = prediction.firstName;
+            prediction.wonAmount = 0;
+            prediction.lostAmount = 0;
+            standings.push(prediction);
+        });
     }
 
     return standings;
 }
 
-async function updateStandings(connection, standings, schedule, matchWinner, res){
+async function updateStandings(connection, standings, schedule, matchWinner, res) {
     let isStandingSaveSuccess = false;
 
     let memberId;
@@ -137,7 +143,7 @@ async function updateStandings(connection, standings, schedule, matchWinner, res
                     alert.push('Unable to save standing');
                     res.cookie('alert', alert, {expires: new Date(Date.now() + 60 * 60000), httpOnly: true});
                     isStandingSaveSuccess = false;
-                   reject(false);
+                    reject(false);
                 }
                 isStandingSaveSuccess = true;
                 resolve(true);
@@ -148,9 +154,9 @@ async function updateStandings(connection, standings, schedule, matchWinner, res
     return isStandingSaveSuccess;
 }
 
-async function updateSchedule(connection, schedule, winner, res){
+async function updateSchedule(connection, schedule, winner, res) {
     let isUpdateScheduleSuccess = false;
-    let sql ="update SCHEDULE set winner='" + winner + "' , isActive = false where matchNumber = " + schedule.matchNumber;
+    let sql = "update SCHEDULE set winner='" + winner + "' , isActive = false where matchNumber = " + schedule.matchNumber;
     await new Promise((resolve, reject) => {
         connection.query(sql, (err, results) => {
             if (err) {
@@ -161,13 +167,13 @@ async function updateSchedule(connection, schedule, winner, res){
                 reject(false);
             }
             isUpdateScheduleSuccess = true;
-           resolve(true);
+            resolve(true);
         });
     });
     return isUpdateScheduleSuccess;
 }
 
-async function updateResult(connection, schedule, matchWinner, adminAmount, res){
+async function updateResult(connection, schedule, matchWinner, adminAmount, res) {
     let isResultUpdated = false;
     let sql = "INSERT INTO RESULTS SET ?";
 
@@ -196,9 +202,9 @@ async function updateResult(connection, schedule, matchWinner, adminAmount, res)
     return isResultUpdated;
 }
 
-async function updateMatchday(connection, matchDay, res){
+async function updateMatchday(connection, matchDay, res) {
     let isUpdateSuccess = false;
-    let sql ="update SCHEDULE set isActive= true where matchDay ="+ matchDay;
+    let sql = "update SCHEDULE set isActive= true where matchDay =" + matchDay;
     await new Promise((resolve, reject) => {
         connection.query(sql, (err, results) => {
             if (err) {
@@ -213,5 +219,18 @@ async function updateMatchday(connection, matchDay, res){
         });
     });
     return isUpdateSuccess;
+}
+
+exports.resultsMapToHistory = function resultsMapToHistory(results, standings){
+    if (standings.length > 0 && results.length >0 ){
+        standings.forEach(standing => {
+            results.forEach(result => {
+                if (standing.matchNumber == result.matchNumber){
+                    standing.adminAmount = result.adminAmount;
+                    standing.adminNet = result.net;
+                }
+            });
+        });
+    }
 }
 

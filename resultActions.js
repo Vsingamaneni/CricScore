@@ -3,6 +3,7 @@ const express = require('express');
 const mysql = require('mysql');
 const bodyParser = require('body-parser');
 let resultUtils = require('./util/resultsUtil');
+let adminUtils = require('./util/adminUtils');
 var db = require('./db');
 
 const urlencodedParser = bodyParser.urlencoded({extended: false})
@@ -50,17 +51,24 @@ exports.history = app.get('/history/:memberId', async (req, res) => {
             let loginDetails = JSON.parse(req.cookies.loginDetails);
             let memberId = req.params.memberId;
             let standings = await resultUtils.getHistory(connection, memberId);
+            let isAdmin = loginDetails.memberId == memberId && loginDetails.role == 'admin' ? true : false;
 
             let userName = undefined;
             if (standings.length > 0){
                 userName = standings[0].name.toUpperCase();
             }
 
+            if (isAdmin){
+                let results = await resultUtils.getResults(connection);
+                adminUtils.resultsMapToHistory(results, standings);
+            }
+
             res.render('results/history', {
                 title: 'History',
                 loginDetails: loginDetails,
                 standings: standings,
-                userName: userName
+                userName: userName,
+                isAdmin: isAdmin
             });
         } else {
             res.redirect('/login');

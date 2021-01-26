@@ -371,6 +371,7 @@ exports.updateSinglePredictions = app.post('/updateSinglePredictions/:matchNumbe
             }
         } else {
             const matchNumber = req.params.matchNumber;
+            const memberId = req.params.memberId;
             try {
                 let loginDetails = JSON.parse(req.cookies.loginDetails);
                 let isActive = await predictionUtils.validateUser(connection, loginDetails);
@@ -385,7 +386,7 @@ exports.updateSinglePredictions = app.post('/updateSinglePredictions/:matchNumbe
                         return res.redirect('/viewPredictions');
                     }
                 }
-                if (predictionUtils.updateSinglePrediction(connection, req, matchNumber, res)) {
+                if (predictionUtils.updateSinglePrediction(connection, req, matchNumber, res, memberId)) {
                     const updateMessage = [];
                     updateMessage.push('Predictions updated successfully for Game # : ' + matchNumber);
                     res.cookie('msg', updateMessage, {expires: new Date(Date.now() + 60 * 60000), httpOnly: true});
@@ -462,6 +463,14 @@ exports.updatePredictions = app.get('/updatePredictions/:matchNumber/:memberId/:
             }
         }
 
+        let predictionsList = [];
+        if (predictions.length > 0){
+            predictions.forEach(prediction =>{
+                if (!prediction.isDeadlineReached){
+                    predictionsList.push(prediction);
+                }
+            })
+        }
         predictionUtils.setMatchAmounts(predictions);
 
         res.cookie('schedule', schedule, {expires: new Date(Date.now() + 100 * 60000), httpOnly: true});
@@ -469,7 +478,7 @@ exports.updatePredictions = app.get('/updatePredictions/:matchNumber/:memberId/:
         return res.render('predictions/updatePredictions', {
             title: 'Update Prediction',
             loginDetails: loginDetails,
-            schedule: predictions,
+            schedule: predictionsList,
             memberId: loginDetails.memberId,
             matchDay: matchDay,
             type: type,

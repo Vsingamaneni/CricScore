@@ -5,6 +5,11 @@
     <link rel="stylesheet" href="/css/dashboard.css">
     <link rel="stylesheet" href="/css/schedule.css">
     <%- include('../header.ejs') %>
+    <style>
+        a:hover {
+            background-color: #5a5a50;
+        }
+    </style>
 </head>
 <body style="background-color: #f6f7fa;">
 
@@ -55,7 +60,7 @@
                         <tr style="font-size: 18px;">
                     <% } %>
                         <td><%= standing.rank %></td>
-                        <td><a href="/history/<%= standing.memberId %>" style="text-decoration: none;color: white;hover "><%= standing.name %></a></td>
+                        <td><a href="/history/<%= standing.memberId %>" style="text-decoration: none;color: white; onMouseOver:'this.style.color='red'"><%= standing.name %></a></td>
                         <td><%= standing.won %></td>
                         <td><%= standing.lost %></td>
                         <td><%= standing.net %></td>

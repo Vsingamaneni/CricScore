@@ -36,7 +36,7 @@
         <% } %>
 
         <% if (userName != undefined) { %>
-        <h1 style="text-align: center; color: #19B3D3;"><i><%= userName %>'s History  </i></h1>
+            <h1 style="text-align: center; color: #19B3D3;"><i><%= userName %>'s History </i></h1>
         <% } %>
         <br><br>
         <div class="container">
@@ -51,19 +51,16 @@
                     <th><i>WON</i></th>
                     <th><i>LOST</i></th>
                     <th><i>NET</i></th>
+                    <% if (isAdmin)  { %>
+                        <th><i>ADMIN</i></th>
+                        <th><i>NET</i></th>
+                    <% } %>
                 </tr>
                 </thead>
                 <tbody>
                 <% standings.forEach(function(standing){ %>
-                    <% if (standing.result == 'won') { %>
-                    <tr style="color: #97f555;font-size: 18px;height: 15px;">
-                        <% } %>
-                        <% if (standing.result == 'lost') { %>
-                    <tr style="color: #ee0673;font-size: 18px;">
-                        <% } %>
-                        <% if (standing.result == 'default') { %>
-                    <tr style="color: #15dddd;font-size: 18px;">
-                        <% } %>
+                    <tr style="height: 5px;"></tr>
+                    <tr style="font-size: 18px;">
                         <td><%= standing.matchNumber %></td>
                         <td><%= standing.homeTeam %> vs <%= standing.awayTeam %>
                         </td>
@@ -73,6 +70,10 @@
                         <td><%= standing.wonAmount %></td>
                         <td><%= standing.lostAmount %></td>
                         <td><%= standing.net %></td>
+                        <% if (isAdmin)  { %>
+                            <td><%= standing.adminAmount %></td>
+                            <td><%= standing.adminNet %></td>
+                        <%}%>
                     </tr>
                     <tr style="height: 5px;"></tr>
                 <% }); %>
