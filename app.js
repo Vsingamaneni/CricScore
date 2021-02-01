@@ -13,6 +13,7 @@ var schedule = require('./schedule');
 var predictions = require('./predictions');
 var adminAction = require('./adminActions');
 var resultAction = require('./resultActions');
+var lastSeason = require('./lastSeason');
 
 var db = require('./db');
 
@@ -90,6 +91,10 @@ app.post('/updateMatchResult/:matchNumber', adminAction.updateMatchResult);
 // Result consolidation actions
 app.get('/standings', resultAction.standings);
 app.get('/history/:memberId', resultAction.history);
+
+// Previous Season
+app.get('/previousUsers', lastSeason.previousUsers);
+app.get('/previousStandings', lastSeason.previousStandings);
 
 app.get('/users',(req, res) => {
     //res.send('Hello There');

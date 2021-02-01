@@ -46,8 +46,8 @@
                     <th><i>#</i></th>
                     <th><i>MATCH</i></th>
                     <th><i>SELECTED</i></th>
-                    <th><i>BET</i></th>
                     <th><i>WINNER</i></th>
+                    <th><i>BET</i></th>
                     <th><i>WON</i></th>
                     <th><i>LOST</i></th>
                     <th><i>NET</i></th>
@@ -65,14 +65,14 @@
                         <td><%= standing.homeTeam %> vs <%= standing.awayTeam %>
                         </td>
                         <td><%= standing.selected %></td>
-                        <td><%= standing.amount %></td>
                         <td><%= standing.winner %></td>
+                        <td><%= standing.amount %></td>
                         <td><%= standing.wonAmount %></td>
                         <td><%= standing.lostAmount %></td>
-                        <td><%= standing.net %></td>
+                        <td style="color: greenyellow;"><%= standing.net %></td>
                         <% if (isAdmin)  { %>
                             <td><%= standing.adminAmount %></td>
-                            <td><%= standing.adminNet %></td>
+                            <td style="color: greenyellow;"><%= standing.adminNet %></td>
                         <%}%>
                     </tr>
                     <tr style="height: 5px;"></tr>

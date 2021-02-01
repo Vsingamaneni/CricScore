@@ -277,7 +277,6 @@ exports.usersList = app.get('/users', async (req, res) => {
             title: 'Users List',
             loginDetails: loginDetails,
             usersList: usersList,
-            loginDetails: loginDetails,
             alert,
             msg
         });
