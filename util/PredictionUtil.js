@@ -221,9 +221,10 @@ exports.getAllPredictionsPerGame = async function getAllPredictionsPerGame(conne
 exports.mapPredictionsToSchedule = function mapPredictionsToSchedule(predictions, schedule) {
     // schedule is a list
     if (schedule.length > 0) {
-        validateDeadline(schedule);
+        validateDeadlineList(schedule);
         schedule.forEach(function (match) {
             let allowPrediction = true;
+            let isPartial = false;
             if (predictions.size > 0) {
                 for (const [key, value] of predictions.entries()) {
                     if (match.matchDay == key) {
@@ -235,6 +236,7 @@ exports.mapPredictionsToSchedule = function mapPredictionsToSchedule(predictions
                                 allowPrediction = false;
                             }
                         } else if (match.games == value.length) {
+                            isPartial = partialDeadlineCheck(match);
                             allowPrediction = false;
                         } else if (match.games > value.length) {
                             match.isPartialPredicted = true;
@@ -248,9 +250,24 @@ exports.mapPredictionsToSchedule = function mapPredictionsToSchedule(predictions
                 }
             }
             match.allow = allowPrediction;
+            match.isPartial = isPartial;
         })
     }
 
+}
+
+function validateDeadlineList(gameWeekSchedule) {
+    if (gameWeekSchedule.length > 0) {
+        gameWeekSchedule.forEach(game => {
+            if (!Array.isArray(game.deadline)){
+                validateDeadline(gameWeekSchedule);
+            } else {
+                game.deadline.forEach(schedule =>{
+                    game.isDeadlineReached = isDeadlineReached(schedule);
+                })
+            }
+        });
+    }
 }
 
 function validateDeadline(gameWeekSchedule) {
@@ -259,6 +276,28 @@ function validateDeadline(gameWeekSchedule) {
             game.isDeadlineReached = isDeadlineReached(game.deadline);
         });
     }
+}
+
+function partialDeadlineCheck(match) {
+    let isDeadline = false;
+    let isNotDeadline = false;
+    let isPartial = false;
+    if (match.deadline.length > 0) {
+        match.deadline.forEach(game => {
+            if (isDeadlineReached(game)){
+                isDeadline = true;
+            }
+
+            if (!isDeadlineReached(game)){
+                isNotDeadline = true;
+            }
+
+            if (isDeadline && isNotDeadline){
+                isPartial = true;
+            }
+        });
+    }
+    return isPartial;
 }
 
 exports.isDeadlineReachedForPrediction = async function isDeadlineReachedForPrediction(connection, matchNumber) {
@@ -380,9 +419,13 @@ exports.predictionDetails = function predictionDetails(matchDaySchedule) {
     if (matchDaySchedule.size > 0) {
         for (const [key, value] of matchDaySchedule.entries()) {
             let singleSchedule = {'matchDay': key};
+            let deadline = [];
             singleSchedule.localDate = value[0].localDate;
             singleSchedule.games = value.length;
-            singleSchedule.deadline = value[0].deadline;
+            value.forEach(game => {
+                deadline.push(game.deadline);
+            })
+            singleSchedule.deadline = deadline;
             singleSchedule.allow = true;
             singleSchedule.matchNumber = value[0].matchNumber;
             finalPredictionSchedule.push(singleSchedule);
@@ -625,12 +668,13 @@ exports.saveSinglePredictions = async function saveSinglePredictions(connection,
     return isPredictionSaveSuccess;
 }
 
-exports.updateSinglePrediction = async function updateSinglePrediction(connection, req, matchId, res) {
+exports.updateSinglePrediction = async function updateSinglePrediction(connection, req, matchId, res, memberId) {
     let isPredictionSaveSuccess = false;
     var date = new Date();
 
     //let sql = "UPDATE PREDICTIONS SET selected='" + req.body.selected + "',amount='" + req.body.amount + "', predictedTime ='" + dateFormat(date, "isoDateTime") + "' where matchNumber = " + matchId;
-    let sql = "UPDATE PREDICTIONS SET selected='" + req.body.selected + "',amount='" + req.body.amount + "', predictedTime ='" + dateAndTime.format(date, pattern) + "' where matchNumber = " + matchId;
+    let sql = "UPDATE PREDICTIONS SET selected='" + req.body.selected + "',amount='" + req.body.amount + "', predictedTime ='" + dateAndTime.format(date, pattern) + "' where matchNumber = " + matchId
+                        + " and memberId = " + memberId;
 
     connection.query(sql, (err, results) => {
         if (err) {
@@ -664,6 +708,7 @@ exports.mapScheduleToPrediction = function mapScheduleToPrediction(schedule, pre
                                 userPrediction.matchDay = game.matchDay;
                                 /*userPrediction.deadline = clientTimeZoneMoment(game.deadline, req.cookies.clientOffset);*/
                                 userPrediction.deadline = game.deadline;
+                                userPrediction.deadline = game.deadline;
                                 userPrediction.minAmount = game.minAmount;
                                 userPrediction.maxAmount = game.maxAmount;
                                 userPrediction.amount = prediction.amount;
@@ -677,6 +722,7 @@ exports.mapScheduleToPrediction = function mapScheduleToPrediction(schedule, pre
                             userPrediction.matchDay = game.matchDay;
                             userPrediction.homeTeam = game.homeTeam;
                             userPrediction.awayTeam = game.awayTeam;
+                            userPrediction.deadline = game.deadline;
                             /*userPrediction.deadline = clientTimeZoneMoment(game.deadline, req.cookies.clientOffset);*/
                             userPrediction.deadline = game.deadline;
                             userPrediction.amount = 0;
@@ -709,7 +755,7 @@ exports.mapScheduleToPrediction = function mapScheduleToPrediction(schedule, pre
         }
     }
 
-    validateDeadline(predictions);
+    validateDeadline(predictionsList);
     return predictionsList;
 }
 
@@ -763,7 +809,11 @@ exports.generateClientTimeZone = function generateClientTimeZone(gameWeekSchedul
     gameWeekSchedule.forEach(game => {
         let format = 'lll';
         /*let format = 'MMM DD YYYY, hh:mm:ss A';*/
-        let date = new Date(game.deadline);
+        let dateString = '';
+        if (game.deadline.length > 0){
+            dateString = game.deadline[game.deadline.length -1];
+        }
+        let date = new Date(dateString);
         game.localDate = mom(date).tz(clientTimeZone).format(format);
 
         if (game.predictedTime != 'N/A') {
