@@ -58,9 +58,16 @@ exports.history = app.get('/history/:memberId', async (req, res) => {
                 userName = standings[0].name.toUpperCase();
             }
 
+            let standingsTotal;
+            let adminTotal
             if (isAdmin){
                 let results = await resultUtils.getResults(connection);
                 adminUtils.resultsMapToHistory(results, standings);
+
+                standingsTotal = await resultUtils.getOperatingTotal(connection);
+                adminTotal = await resultUtils.getAdminTotal(connection);
+                adminTotal.net = standingsTotal.won + standingsTotal.lost + adminTotal.admin;
+
             }
 
             res.render('results/history', {
@@ -68,7 +75,9 @@ exports.history = app.get('/history/:memberId', async (req, res) => {
                 loginDetails: loginDetails,
                 standings: standings,
                 userName: userName,
-                isAdmin: isAdmin
+                isAdmin: isAdmin,
+                standingsTotal: standingsTotal,
+                adminTotal: adminTotal
             });
         } else {
             res.redirect('/login');

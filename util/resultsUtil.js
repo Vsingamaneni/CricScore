@@ -39,14 +39,14 @@ exports.getStandings = async function getStandings(connection, loginDetails, req
 
                 if (results.length > 0) {
                     results.forEach(function (standing) {
-                        users.forEach(user =>{
-                           if (user.memberId == standing.memberId){
-                               if (user.isActive){
-                                   standing.status = 'ACTIVE';
-                               } else {
-                                   standing.status = 'INACTIVE'
-                               }
-                           }
+                        users.forEach(user => {
+                            if (user.memberId == standing.memberId) {
+                                if (user.isActive) {
+                                    standing.status = 'ACTIVE';
+                                } else {
+                                    standing.status = 'INACTIVE'
+                                }
+                            }
                         });
                         standing.rank = rank;
                         if (loginDetails.memberId == standing.memberId) {
@@ -68,6 +68,59 @@ exports.getStandings = async function getStandings(connection, loginDetails, req
     return standings;
 }
 
+exports.getOperatingTotal = async function getOperatingTotal(connection) {
+
+    let sql = `SELECT sum(wonAmount) as won, sum(lostAmount) as lost from STANDINGS`;
+    let standingsTotal = {'a': 123};
+
+    await new Promise((resolve, reject) => {
+        connection.query(sql, function (err, results) {
+            if (err) {
+                reject(err);
+            } else {
+
+                if (results.length > 0) {
+                    results.forEach(function (standing) {
+                        standingsTotal.won = standing.won;
+                        standingsTotal.lost = standing.lost;
+                        resolve(standingsTotal);
+                    });
+                } else {
+                    resolve(standingsTotal);
+                }
+            }
+        });
+    });
+
+    return standingsTotal;
+}
+
+exports.getAdminTotal = async function getAdminTotal(connection) {
+
+    let sql = `SELECT sum(adminAmount) as adminAmount from RESULTS`;
+    let adminTotal = {'a': 123};
+
+    await new Promise((resolve, reject) => {
+        connection.query(sql, function (err, results) {
+            if (err) {
+                reject(err);
+            } else {
+
+                if (results.length > 0) {
+                    results.forEach(function (standing) {
+                        adminTotal.admin = standing.adminAmount;
+                        resolve(adminTotal);
+                    });
+                } else {
+                    resolve(adminTotal);
+                }
+            }
+        });
+    });
+
+    return adminTotal;
+}
+
 exports.getHistory = async function getHistory(connection, id) {
 
     let sql = `select * from STANDINGS where memberId = ` + id;
@@ -81,13 +134,13 @@ exports.getHistory = async function getHistory(connection, id) {
 
                 if (results.length > 0) {
                     results.forEach(function (standing) {
-                        net = standing.wonAmount + standing.lostAmount+ net;
+                        net = standing.wonAmount + standing.lostAmount + net;
                         if (standing.wonAmount != 0) {
                             standing.result = 'won';
                             standing.net = standing.wonAmount;
                         } else if (standing.lostAmount != 0) {
                             standing.result = 'lost';
-                            if (standing.selected == 'Default'){
+                            if (standing.selected == 'Default') {
                                 standing.result = 'default';
                             }
                             standing.net = standing.lostAmount;
@@ -95,7 +148,7 @@ exports.getHistory = async function getHistory(connection, id) {
 
                         standing.net = net.toFixed(2);
 
-                        standing.net = Number(Math.round(net+'e2')+'e-2');
+                        standing.net = Number(Math.round(net + 'e2') + 'e-2');
 
                         userStandings.push(standing);
                     });

@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title><%= title %></title>
+    <link rel="stylesheet" href="/css/dashboard.css">
+    <link rel="stylesheet" href="/css/schedule.css">
+    <%- include('../header.ejs') %>
+    <style>
+        a:hover {
+            background-color: #5a5a50;
+        }
+    </style>
+</head>
+<body style="background-color: #f6f7fa;">
+
+<div>
+    <%- include('../body.ejs') %>
+    <div class="content" style="background-color:#f6f7fa">
+        <br><br><br><br><br><br>
+
+        <table class="table table-dark table-striped" style="width: 15%;">
+            <thead>
+            <tr style="background-color: #5b5d5d;font-size: 18px;">
+                <th><i><a onMouseOver="this.style.color='#18dbdb'" onMouseOut="this.style.color=white;" href="/previousUsers" style="text-decoration: none;color: white;">&laquo;&laquo;   2020 USERS</a></i></th>
+            </tr>
+            </thead>
+        </table>
+        <br><br>
+
+        <h1 style="text-align: center; color: #19B3D3;"><i> 2020 Standings </i></h1>
+        <div class="container">
+            <table class="table table-dark table-striped" style="width:80%;">
+                <thead>
+                <tr style="background-color: #5b5d5d;font-size: 18px;">
+                    <th><i>#</i></th>
+                    <th><i>NAME</i></th>
+                    <th><i>WON</i></th>
+                    <th><i>LOST</i></th>
+                    <th><i>NET</i></th>
+                </tr>
+                </thead>
+                <tbody><% standings.forEach(function(standing){ %>
+                    <% if (standing.active) { %>
+                    <tr style="background-color: #19B3D3;font-size: 18px;">
+                        <% } %>
+                        <% if (!standing.active) { %>
+                    <tr style="font-size: 18px;">
+                        <% } %>
+                        <td><%= standing.rank %></td>
+                        <td><a href="/history/<%= standing.memberId %>" style="text-decoration: none;color: white; onMouseOver:'this.style.color='red'"><%= standing.name %></a></td>
+                        <td><%= standing.wonAmount %></td>
+                        <td><%= standing.lostAmount %></td>
+                        <td><%= standing.net %></td>
+                    </tr>
+                    <tr style="height: 5px;"></tr>
+                <% }); %>
+                </tbody>
+            </table>
+        </div>
+
+        <div style="width: 100px; margin-left: auto; margin-right: auto;color: white;">
+            <a href="/previousUsers" class="next">&laquo; BACK</a>
+        </div>
+        <br><br>
+
+    </div>
+</div>
+
+</body>
+</html>
