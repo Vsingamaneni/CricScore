@@ -54,6 +54,10 @@ exports.previousStandings = app.get('/previousStandings', async (req, res) => {
         try {
             let userStandings = JSON.parse(standings);
 
+            userStandings.forEach(user => {
+                user.name = user.name.toUpperCase();
+            })
+
             res.render('results/previousStandings', {
                 title: '2020 Standings',
                 loginDetails: loginDetails,

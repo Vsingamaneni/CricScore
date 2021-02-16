@@ -20,17 +20,16 @@
     </center>
     <a href="/dashboard"><i class="fas fa-home"></i><span>Home</span></a>
     <a href="/schedule"><i class="far fa-calendar-alt"></i><span>Schedule</span></a>
-    <a href="/predictions"><i class="fas fa-table"></i><span>Predictions</span></a>
-    <a href="/viewPredictions"><i class="fas fa-sliders-h"></i><span>My Predictions</span></a>
-    <a href="/matchDayPredictions"><i class="fas fa-th"></i><span>Match Day</span></a>
-    <a href="/standings"><i class="fas fa-list-ol"></i><span>Standings</span></a>
+    <a href="/predictions"><i class="fas fa-book-reader"></i><span>Predictions</span></a>
+    <a href="/viewPredictions"><i class="fas fa-calendar-check"></i><span>My Predictions</span></a>
+    <a href="/matchDayPredictions"><i class="fas fa-check-double"></i><span>Match Day</span></a>
+    <a href="/standings"><i class="fas fa-chart-line"></i><span>Standings</span></a>
     <% if (loginDetails.role == 'admin') {%>
-        <a href="/updateResult"><i class="fas fa-th"></i><span>Update Result</span></a>
+        <a href="/updateResult"><i class="fas fa-bullhorn"></i><span>Update Result</span></a>
     <%}%>
-    <a href="/history/<%= loginDetails.memberId %>"><i class="fas fa-info-circle"></i><span>History</span></a>
-    <a href="#"><i class="fas fa-poll"></i><span>Stats</span></a>
+    <a href="/history/<%= loginDetails.memberId %>"><i class="fas fa-history"></i><span>History</span></a>
     <a href="#"><i class="fas fa-pencil-ruler"></i><span>Rules</span></a>
     <a href="/users"><i class="fas fa-user-friends"></i><span>Users</span></a>
-    <a href="/previousUsers"><i class="fas fa-poll-h"></i><span>2020</span></a>
+    <a href="/previousUsers"><i class="fas fa-address-card"></i><span>2020</span></a>
 </div>
 <!--sidebar end-->
